@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+group = 'com.pr'
+version = '0.0.1-SNAPSHOT'
+buildDir = "build/gradle"
+
+dependencies {
+  compile gradleApi()
+  testCompile 'junit:junit:4.12'
+}
+
+uploadArchives {
+  repositories {
+    mavenLocal()
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+eclipse.classpath.downloadSources = true
+eclipse.classpath.downloadJavadoc = true
+eclipse.jdt.sourceCompatibility=1.8
+eclipse.classpath.defaultOutputDir = file('build/eclipse')
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.0'
+}

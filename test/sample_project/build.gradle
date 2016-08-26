@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'gradle-javaexecfork-plugin'
+
+buildscript {
+  repositories {
+    mavenLocal()
+  }
+  dependencies {
+    classpath 'com.pr:gradle-javaexecfork-plugin:0.0.1-SNAPSHOT'
+  }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.0'
+}
+
+task parentTask(dependsOn: ':daemonTask') << {
+    println "I hope the daemon is running"
+}
+
+task daemonTask(type: com.pr.gradle.JavaExecFork, dependsOn: 'classes') {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Main'
+    finalizes = parentTask
+}
+
+build.dependsOn parentTask
