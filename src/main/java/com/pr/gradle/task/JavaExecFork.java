@@ -1,6 +1,12 @@
-package com.pr.gradle;
+package com.pr.gradle.task;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,18 +23,21 @@ import org.gradle.process.internal.ExecActionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pr.gradle.daemon.Server;
+
 public class JavaExecFork extends DefaultTask {
   protected static final Logger log = LoggerFactory.getLogger(JavaExecFork.class);
   
-  public List<String> jvmArgs;
   public FileCollection classpath;
   public String main;
-  public List<String> args;
-  public Map<String, ?> systemProperties;
-  public Map<String, ?> environment;
-  public OutputStream standardOutput;
-  public OutputStream errorOutput;
+  public List<String> jvmArgs = new ArrayList<>();
+  public List<String> args = new ArrayList<>();
+  public Map<String, ?> systemProperties = new HashMap<>();
+  public Map<String, ?> environment = new HashMap<>();
+  public OutputStream standardOutput = new ByteArrayOutputStream();
+  public OutputStream errorOutput = new ByteArrayOutputStream();
   public JavaExecJoin joinTask;
+  public Integer controlPort = Server.findOpenPort();
 
   @Inject
   protected ExecActionFactory getExecActionFactory() {
@@ -48,15 +57,23 @@ public class JavaExecFork extends DefaultTask {
     getProject().javaexec(new Action<JavaExecSpec>() {
       @Override
       public void execute(JavaExecSpec spec) {
-        spec.setMain(main);
+        spec.setMain(Server.class.getName());
         spec.setClasspath(classpath);
+        
+        log.info("buildscript dependencies: {}", getProject().getBuildscript().getDependencies());
 
-        if (args != null) spec.setArgs(args);
-        if (args != null) spec.setJvmArgs(jvmArgs);
-        if (args != null) spec.setSystemProperties(systemProperties);
-        if (args != null) spec.setEnvironment(environment);
-        if (args != null) spec.setStandardOutput(standardOutput);
-        if (args != null) spec.setErrorOutput(errorOutput);
+        if (args == null)
+          args = new ArrayList<>();
+
+        args.add(0, main);
+        args.add(1, Integer.toString(controlPort));
+        spec.setArgs(args);
+
+        spec.setJvmArgs(jvmArgs);
+        spec.setSystemProperties(systemProperties);
+        spec.setEnvironment(environment);
+        spec.setStandardOutput(standardOutput);
+        spec.setErrorOutput(errorOutput);
       }
     });
     log.info("done executing {}!", main);
@@ -65,5 +82,13 @@ public class JavaExecFork extends DefaultTask {
   public void setFinalizes(Task finalizes) {
     log.info("***** adding {}_join as a finalizing task to {}", getName(), finalizes.getName());
     finalizes.finalizedBy(joinTask);
+  }
+  
+  public void setStandardOutput(File file) throws FileNotFoundException {
+    this.standardOutput = new FileOutputStream(file);
+  }
+
+  public void setErrorOutput(File file) throws FileNotFoundException {
+    this.errorOutput = new FileOutputStream(file);
   }
 }

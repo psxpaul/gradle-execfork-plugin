@@ -15,14 +15,16 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
 
-task parentTask(dependsOn: ':daemonTask') << {
+task integrationTest(dependsOn: ':startDaemon') << {
     println "I hope the daemon is running"
 }
+build.dependsOn integrationTest
 
-task daemonTask(type: com.pr.gradle.JavaExecFork, dependsOn: 'classes') {
+task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
+    buildDir.mkdir()
     classpath = sourceSets.main.runtimeClasspath
     main = 'Main'
-    finalizes = parentTask
+    standardOutput = file("$buildDir/daemon.log")
+    errorOutput = file("$buildDir/daemon-error.log")
+    finalizes = integrationTest
 }
-
-build.dependsOn parentTask
