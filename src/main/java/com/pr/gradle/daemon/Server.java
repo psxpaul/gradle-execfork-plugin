@@ -2,6 +2,7 @@ package com.pr.gradle.daemon;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,17 +10,12 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Server {
-  private static final Logger log = LoggerFactory.getLogger(Server.class);
-
   public static void main(String[] args) throws Exception {
     assert args.length >= 2;
 
-    int controlPort = Integer.parseInt(args[0]);
-    String className = args[1];
+    String className = args[0];
+    int controlPort = Integer.parseInt(args[1]);
     String[] classArgs = args.length > 2 ? Arrays.copyOfRange(args, 2, args.length) : new String[]{};
 
     Class<?> mainClass = Class.forName(className);
@@ -27,23 +23,28 @@ public class Server {
     final AtomicBoolean mainTerminated = new AtomicBoolean(false);
 
     try (ServerSocket serverSocket = new ServerSocket(controlPort)) {
-      Thread mainThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            mainMethod.invoke(mainClass, new Object[]{ classArgs });
-            mainTerminated.set(true);
-          } catch (Exception e) {
-            mainTerminated.set(true);
-            log.error("Error invoking main method {}", className, e);
+      Thread mainThread = new Thread(() -> {
+        try {
+          mainMethod.invoke(mainClass, new Object[]{ classArgs });
+          mainTerminated.set(true);
+        } catch (InvocationTargetException e) {
+          mainTerminated.set(true);
+          if (e.getCause() instanceof InterruptedException) {
+            System.out.println(className + " stopped");
+          } else {
+            System.err.println("Error invoking main method " + className);
             throw new RuntimeException(e);
-          } finally {
-            try {
-              serverSocket.close();
-            } catch (IOException e) {
-              log.error("Error closing server socket", e);
-              throw new RuntimeException(e);
-            }
+          }
+        } catch (Exception e) {
+          mainTerminated.set(true);
+          System.err.println("Error invoking main method " + className);
+          throw new RuntimeException(e);
+        } finally {
+          try {
+            serverSocket.close();
+          } catch (IOException e) {
+            System.err.println("Error closing server socket");
+            throw new RuntimeException(e);
           }
         }
       });
@@ -58,10 +59,10 @@ public class Server {
       }
     } catch (SocketException e) {
       if (mainTerminated.get() && e.getMessage().contains("Socket closed")) {
-        log.info("Ignoring {} with message {}, because main class has already terminated",
-            SocketException.class.getSimpleName(), e.getMessage());
+        System.out.println("Ignoring " + SocketException.class.getSimpleName() + 
+            " with message " + e.getMessage() + ", because main class has already terminated");
       } else {
-        log.error("Unexpected {}", SocketException.class.getSimpleName(), e);
+        System.err.println("Unexpected " + SocketException.class.getSimpleName());
         throw e;
       }
     }

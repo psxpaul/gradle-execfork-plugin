@@ -90,14 +90,11 @@ public class ServerTest {
   }
   
   private void startMainClass(Class<?> mainClass) {
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Server.main(new String[]{ controlPort.toString(), mainClass.getName(), "arg1", "arg2" });
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        }
+    executor.execute(() -> {
+      try {
+        Server.main(new String[]{ mainClass.getName(), controlPort.toString(), "arg1", "arg2" });
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
     });
   }

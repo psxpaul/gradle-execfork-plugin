@@ -19,25 +19,21 @@ public class ClientTest {
   @Test
   public void shouldSendStop() throws Exception {
     final List<String> requests = new ArrayList<>();
-
-    Thread t = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(controlPort)) {
-          try (Socket socket = serverSocket.accept();
-              ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
-            requests.add(inputStream.readUTF());
-          }
-        } catch (IOException e) {
-          throw new RuntimeException(e);
+    Thread thread = new Thread(() -> {
+      try (ServerSocket serverSocket = new ServerSocket(controlPort)) {
+        try (Socket socket = serverSocket.accept();
+            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
+          requests.add(inputStream.readUTF());
         }
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
     });
-    t.start();
+    thread.start();
     Thread.sleep(100); //wait for server to start
     
     new Client(controlPort).sendStopCommand();
-    t.join(5000);
+    thread.join(5000);
     assertThat(requests, hasSize(1));
     assertThat(requests.get(0), equalTo(Command.STOP.name()));
   }

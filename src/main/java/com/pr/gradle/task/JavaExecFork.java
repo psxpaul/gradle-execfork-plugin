@@ -34,8 +34,8 @@ public class JavaExecFork extends DefaultTask {
   public List<String> args = new ArrayList<>();
   public Map<String, ?> systemProperties = new HashMap<>();
   public Map<String, ?> environment = new HashMap<>();
-  public OutputStream standardOutput = new ByteArrayOutputStream();
-  public OutputStream errorOutput = new ByteArrayOutputStream();
+  private OutputStream standardOutput = new ByteArrayOutputStream();
+  private OutputStream errorOutput = new ByteArrayOutputStream();
   public JavaExecJoin joinTask;
   public Integer controlPort = Server.findOpenPort();
 
@@ -54,28 +54,30 @@ public class JavaExecFork extends DefaultTask {
       throw new GradleException(JavaExecFork.class.getSimpleName() + " task '" + getName() + "' must specify a classpath");
     }
 
-    getProject().javaexec(new Action<JavaExecSpec>() {
-      @Override
-      public void execute(JavaExecSpec spec) {
-        spec.setMain(Server.class.getName());
-        spec.setClasspath(classpath);
-        
-        log.info("buildscript dependencies: {}", getProject().getBuildscript().getDependencies());
+    Thread t = new Thread(() -> {
+      getProject().javaexec(new Action<JavaExecSpec>() {
+        @Override
+        public void execute(JavaExecSpec spec) {
+          FileCollection buildScriptClasspath = getProject().getBuildscript().getConfigurations().getByName("classpath");
+          spec.setMain(Server.class.getName());
+          spec.setClasspath(classpath.plus(buildScriptClasspath));
+          
+          if (args == null)
+            args = new ArrayList<>();
 
-        if (args == null)
-          args = new ArrayList<>();
+          args.add(0, main);
+          args.add(1, Integer.toString(controlPort));
+          spec.setArgs(args);
 
-        args.add(0, main);
-        args.add(1, Integer.toString(controlPort));
-        spec.setArgs(args);
-
-        spec.setJvmArgs(jvmArgs);
-        spec.setSystemProperties(systemProperties);
-        spec.setEnvironment(environment);
-        spec.setStandardOutput(standardOutput);
-        spec.setErrorOutput(errorOutput);
-      }
+          spec.setJvmArgs(jvmArgs);
+          spec.setSystemProperties(systemProperties);
+          spec.setEnvironment(environment);
+          spec.setStandardOutput(standardOutput);
+          spec.setErrorOutput(errorOutput);
+        }
+      });
     });
+    t.start();
     log.info("done executing {}!", main);
   }
   
@@ -90,5 +92,13 @@ public class JavaExecFork extends DefaultTask {
 
   public void setErrorOutput(File file) throws FileNotFoundException {
     this.errorOutput = new FileOutputStream(file);
+  }
+
+  public void setStandardOutput(OutputStream standardOutput) throws FileNotFoundException {
+    this.standardOutput = standardOutput;
+  }
+
+  public void setErrorOutput(OutputStream errorOutput) throws FileNotFoundException {
+    this.errorOutput = errorOutput;
   }
 }

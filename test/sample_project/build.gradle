@@ -17,14 +17,14 @@ task wrapper(type: Wrapper) {
 
 task integrationTest(dependsOn: ':startDaemon') << {
     println "I hope the daemon is running"
+    Thread.sleep(3*1000)
 }
 build.dependsOn integrationTest
 
 task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
-    buildDir.mkdir()
     classpath = sourceSets.main.runtimeClasspath
     main = 'Main'
-    standardOutput = file("$buildDir/daemon.log")
-    errorOutput = file("$buildDir/daemon-error.log")
+    standardOutput = System.out
+    errorOutput = System.err
     finalizes = integrationTest
 }
