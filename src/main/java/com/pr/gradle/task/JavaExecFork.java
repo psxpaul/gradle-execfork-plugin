@@ -37,6 +37,7 @@ public class JavaExecFork extends DefaultTask {
   private OutputStream standardOutput = new ByteArrayOutputStream();
   private OutputStream errorOutput = new ByteArrayOutputStream();
   public JavaExecJoin joinTask;
+  public Task stopAfter;
   public Integer controlPort = Server.findOpenPort();
 
   @Inject
@@ -52,6 +53,10 @@ public class JavaExecFork extends DefaultTask {
 
     if (classpath == null) {
       throw new GradleException(JavaExecFork.class.getSimpleName() + " task '" + getName() + "' must specify a classpath");
+    }
+
+    if (stopAfter == null) {
+      throw new GradleException(JavaExecFork.class.getSimpleName() + " task '" + getName() + "' must specify a stopAfter task");
     }
 
     Thread t = new Thread(() -> {
@@ -81,9 +86,10 @@ public class JavaExecFork extends DefaultTask {
     log.info("done executing {}!", main);
   }
   
-  public void setFinalizes(Task finalizes) {
-    log.info("***** adding {}_join as a finalizing task to {}", getName(), finalizes.getName());
-    finalizes.finalizedBy(joinTask);
+  public void setStopAfter(Task stopAfter) {
+    log.info("Adding {} as a finalizing task to {}", joinTask.getName(), stopAfter.getName());
+    stopAfter.finalizedBy(joinTask);
+    this.stopAfter = stopAfter;
   }
   
   public void setStandardOutput(File file) throws FileNotFoundException {

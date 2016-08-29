@@ -26,5 +26,5 @@ task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
     main = 'Main'
     standardOutput = System.out
     errorOutput = System.err
-    finalizes = integrationTest
+    stopAfter = integrationTest
 }
