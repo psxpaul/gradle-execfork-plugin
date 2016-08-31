@@ -13,8 +13,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.pr.gradle.util.PortUtils;
+
 public class ClientTest {
-  int controlPort = Server.findOpenPort();
+  int controlPort = PortUtils.findOpenPort();
 
   @Test
   public void shouldSendStop() throws Exception {

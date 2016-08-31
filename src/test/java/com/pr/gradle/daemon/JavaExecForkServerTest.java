@@ -15,14 +15,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServerTest {
+import com.pr.gradle.util.PortUtils;
+
+public class JavaExecForkServerTest {
   static String[] receivedArgs;
   static AtomicInteger receivedPings;
   static CountDownLatch serverStarted;
   static CountDownLatch serverStopped;
 
-  Integer controlPort = Server.findOpenPort();
+  Integer controlPort = PortUtils.findOpenPort();
   ExecutorService executor = Executors.newSingleThreadExecutor();
+  Integer exitCode;
   
   @Before
   public void setup() {
@@ -30,6 +33,11 @@ public class ServerTest {
     receivedPings = new AtomicInteger(0);
     serverStarted = new CountDownLatch(1);
     serverStopped = new CountDownLatch(1);
+    JavaExecForkServer.EXIT = status ->  {
+      serverStopped.countDown();
+      if (exitCode == null) // only care about the first call to System.exit()
+        exitCode = status;
+    };
   }
 
   @Test
@@ -47,6 +55,9 @@ public class ServerTest {
 
     new Client(controlPort).sendStopCommand();
     serverStopped.await(5, TimeUnit.SECONDS);
+
+    assertThat(serverStopped.getCount(), equalTo(0L));
+    assertThat(exitCode, equalTo(0));
   }
 
   @Test
@@ -61,21 +72,41 @@ public class ServerTest {
     
     Thread.sleep(50);
     assertThat(receivedPings.get(), greaterThanOrEqualTo(10));
-    serverStopped.await(5, TimeUnit.SECONDS);
+    serverStopped.await(10, TimeUnit.SECONDS);
+
+    assertThat(serverStopped.getCount(), equalTo(0L));
+    assertThat(exitCode, equalTo(0));
+  }
+
+  @Test
+  public void shouldRunMainClassThatIgnoresInterrupts() throws Exception {
+    assertThat(receivedPings.get(), equalTo(0));
+    startMainClass(StubMainClassIgnoresInterrupts.class);
+
+    serverStarted.await(1, TimeUnit.SECONDS);
+    assertThat(receivedArgs, arrayWithSize(2));
+    assertThat(receivedArgs[0], equalTo("arg1"));
+    assertThat(receivedArgs[1], equalTo("arg2"));
+    
+    Thread.sleep(1000);
+    assertThat(receivedPings.get(), greaterThanOrEqualTo(10));
+
+    new Client(controlPort).sendStopCommand();
+    serverStopped.await(10, TimeUnit.SECONDS);
+
+    assertThat(serverStopped.getCount(), equalTo(0L));
+    assertThat(exitCode, equalTo(-1));
   }
   
   public static class StubMainClass {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
       receivedArgs = args;
       serverStarted.countDown();
 
-      try {
-        while(true) {
-          receivedPings.incrementAndGet();
-          Thread.sleep(100);
-        }
-      } catch (InterruptedException e) {
-        serverStopped.countDown();
+      while(true) {
+        receivedPings.incrementAndGet();
+        System.out.println("ping");
+        Thread.sleep(100);
       }
     }
   }
@@ -89,10 +120,25 @@ public class ServerTest {
     }
   }
   
+  public static class StubMainClassIgnoresInterrupts {
+    public static void main(String[] args) {
+      receivedArgs = args;
+      serverStarted.countDown();
+
+      while(true) {
+        receivedPings.incrementAndGet();
+        System.out.println("ping");
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {}
+      }
+    }
+  }
+  
   private void startMainClass(Class<?> mainClass) {
     executor.execute(() -> {
       try {
-        Server.main(new String[]{ mainClass.getName(), controlPort.toString(), "arg1", "arg2" });
+        JavaExecForkServer.main(new String[]{ mainClass.getName(), controlPort.toString(), "arg1", "arg2" });
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

@@ -1,16 +1,21 @@
 package com.pr.gradle.daemon;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
-public class Server {
+import com.pr.gradle.util.ThrowableUtils;
+
+public class JavaExecForkServer {
+  protected static Consumer<Integer> EXIT = System::exit;
+
   public static void main(String[] args) throws Exception {
     assert args.length >= 2;
 
@@ -22,32 +27,28 @@ public class Server {
     Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
     final AtomicBoolean mainTerminated = new AtomicBoolean(false);
 
-    try (ServerSocket serverSocket = new ServerSocket(controlPort)) {
+    try (ServerSocket serverSocket = new ServerSocket(controlPort, 1, InetAddress.getByName("127.0.0.1"))) {
       Thread mainThread = new Thread(() -> {
         try {
           mainMethod.invoke(mainClass, new Object[]{ classArgs });
           mainTerminated.set(true);
         } catch (InvocationTargetException e) {
           mainTerminated.set(true);
-          if (e.getCause() instanceof InterruptedException) {
+          if (ThrowableUtils.rootCauseOf(e) instanceof InterruptedException) {
             System.out.println(className + " stopped");
           } else {
             System.err.println("Error invoking main method " + className);
-            throw new RuntimeException(e);
+            e.printStackTrace(System.err);
           }
         } catch (Exception e) {
           mainTerminated.set(true);
           System.err.println("Error invoking main method " + className);
-          throw new RuntimeException(e);
+          e.printStackTrace(System.err);
         } finally {
-          try {
-            serverSocket.close();
-          } catch (IOException e) {
-            System.err.println("Error closing server socket");
-            throw new RuntimeException(e);
-          }
+          new Client(controlPort).sendStopCommand();
         }
       });
+      mainThread.setDaemon(true);
       mainThread.start();
 
       Socket socket = serverSocket.accept();
@@ -55,24 +56,27 @@ public class Server {
       String commandString = inputStream.readUTF();
       if (commandString.equals(Command.STOP.name())) {
         mainThread.interrupt();
-        mainThread.join();
+        mainThread.join(5000);
+        if (!mainThread.isAlive()) {
+          EXIT.accept(0);
+        } else {
+          System.err.println("Process did not end after 5 seconds, killing");
+          EXIT.accept(-1);
+        }
+      } else {
+        System.out.println("unknown control command received: " + commandString);
       }
     } catch (SocketException e) {
       if (mainTerminated.get() && e.getMessage().contains("Socket closed")) {
         System.out.println("Ignoring " + SocketException.class.getSimpleName() + 
             " with message " + e.getMessage() + ", because main class has already terminated");
+        EXIT.accept(0);
       } else {
         System.err.println("Unexpected " + SocketException.class.getSimpleName());
-        throw e;
+        e.printStackTrace(System.err);
+        EXIT.accept(-2);
       }
     }
-  }
-  
-  public static int findOpenPort() {
-    try (ServerSocket serverSocket = new ServerSocket(0)) {
-      return serverSocket.getLocalPort();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    EXIT.accept(0);
   }
 }

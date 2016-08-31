@@ -9,13 +9,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.JavaExecSpec;
@@ -23,7 +27,8 @@ import org.gradle.process.internal.ExecActionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pr.gradle.daemon.Server;
+import com.pr.gradle.daemon.JavaExecForkServer;
+import com.pr.gradle.util.PortUtils;
 
 public class JavaExecFork extends DefaultTask {
   protected static final Logger log = LoggerFactory.getLogger(JavaExecFork.class);
@@ -34,11 +39,12 @@ public class JavaExecFork extends DefaultTask {
   public List<String> args = new ArrayList<>();
   public Map<String, ?> systemProperties = new HashMap<>();
   public Map<String, ?> environment = new HashMap<>();
-  private OutputStream standardOutput = new ByteArrayOutputStream();
-  private OutputStream errorOutput = new ByteArrayOutputStream();
+  private Callable<OutputStream> standardOutput = () -> new ByteArrayOutputStream();
+  private Callable<OutputStream> errorOutput = () -> new ByteArrayOutputStream();
   public JavaExecJoin joinTask;
   public Task stopAfter;
-  public Integer controlPort = Server.findOpenPort();
+  public Integer controlPort = PortUtils.findOpenPort();
+  public Integer waitForPort;
 
   @Inject
   protected ExecActionFactory getExecActionFactory() {
@@ -63,10 +69,10 @@ public class JavaExecFork extends DefaultTask {
       getProject().javaexec(new Action<JavaExecSpec>() {
         @Override
         public void execute(JavaExecSpec spec) {
-          FileCollection buildScriptClasspath = getProject().getBuildscript().getConfigurations().getByName("classpath");
-          spec.setMain(Server.class.getName());
+          FileCollection buildScriptClasspath = getBuildscriptClasspath(getProject());
+          spec.setMain(JavaExecForkServer.class.getName());
           spec.setClasspath(classpath.plus(buildScriptClasspath));
-          
+
           if (args == null)
             args = new ArrayList<>();
 
@@ -77,34 +83,65 @@ public class JavaExecFork extends DefaultTask {
           spec.setJvmArgs(jvmArgs);
           spec.setSystemProperties(systemProperties);
           spec.setEnvironment(environment);
-          spec.setStandardOutput(standardOutput);
-          spec.setErrorOutput(errorOutput);
+          spec.setStandardOutput(call(standardOutput));
+          spec.setErrorOutput(call(errorOutput));
         }
       });
     });
     t.start();
     log.info("done executing {}!", main);
+
+    if (waitForPort != null)
+      PortUtils.waitForPortOpen(waitForPort, 60, TimeUnit.SECONDS);
   }
-  
+
+  private OutputStream call(Callable<OutputStream> callable) {
+    try {
+      return callable.call();
+    } catch (Exception e) {
+      throw new GradleException("Error getting OutputStream", e);
+    }
+  }
+
+  private FileCollection getBuildscriptClasspath(Project project) {
+    Configuration classpath = project.getBuildscript().getConfigurations().getByName("classpath");
+    if (classpath.isEmpty() && project.getParent() != null) {
+      return getBuildscriptClasspath(project.getParent());
+    }
+    return classpath;
+  }
+
   public void setStopAfter(Task stopAfter) {
+    if (joinTask == null) {
+      throw new GradleException(JavaExecFork.class.getSimpleName() + " task '" + getName() + "' did not have a joinTask associated. Make sure you have \"apply plugin: 'gradle-javaexecfork-plugin'\" somewhere in your gradle file");
+    }
+
     log.info("Adding {} as a finalizing task to {}", joinTask.getName(), stopAfter.getName());
     stopAfter.finalizedBy(joinTask);
     this.stopAfter = stopAfter;
   }
-  
-  public void setStandardOutput(File file) throws FileNotFoundException {
-    this.standardOutput = new FileOutputStream(file);
+
+  public void setStandardOutput(String filename) throws FileNotFoundException {
+    this.standardOutput = () -> new FileOutputStream(filename);
   }
 
-  public void setErrorOutput(File file) throws FileNotFoundException {
-    this.errorOutput = new FileOutputStream(file);
+  public void setErrorOutput(String filename) throws FileNotFoundException {
+    this.errorOutput = () -> new FileOutputStream(filename);
   }
 
-  public void setStandardOutput(OutputStream standardOutput) throws FileNotFoundException {
-    this.standardOutput = standardOutput;
-  }
+  //public void setStandardOutput(File file) throws FileNotFoundException {
+  //  this.standardOutput = () -> new FileOutputStream(file);
+  //}
 
-  public void setErrorOutput(OutputStream errorOutput) throws FileNotFoundException {
-    this.errorOutput = errorOutput;
-  }
+  //public void setErrorOutput(File file) throws FileNotFoundException {
+  //  this.errorOutput = () -> new FileOutputStream(file);
+  //}
+
+  //public void setStandardOutput(OutputStream standardOutput) throws FileNotFoundException {
+  //  this.standardOutput = () -> standardOutput;
+  //}
+
+  //public void setErrorOutput(OutputStream errorOutput) throws FileNotFoundException {
+  //  this.errorOutput = () -> errorOutput;
+  //}
 }

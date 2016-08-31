@@ -1,5 +1,5 @@
 /build/
-/sample_project/build/
+/sample_projects/*/build/
 .gradle
 .classpath
 .project
