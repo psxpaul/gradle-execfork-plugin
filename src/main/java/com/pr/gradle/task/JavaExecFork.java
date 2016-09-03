@@ -69,6 +69,12 @@ public class JavaExecFork extends DefaultTask {
       getProject().javaexec(new Action<JavaExecSpec>() {
         @Override
         public void execute(JavaExecSpec spec) {
+          log.info("Starting main method {}", main);
+          log.info("using args {}", args);
+          log.info("using jvmArgs {}", jvmArgs);
+          log.info("using systemProperties {}", systemProperties);
+          log.info("using environment {}", environment);
+          
           FileCollection buildScriptClasspath = getBuildscriptClasspath(getProject());
           spec.setMain(JavaExecForkServer.class.getName());
           spec.setClasspath(classpath.plus(buildScriptClasspath));
@@ -78,13 +84,14 @@ public class JavaExecFork extends DefaultTask {
 
           args.add(0, main);
           args.add(1, Integer.toString(controlPort));
-          spec.setArgs(args);
-
-          spec.setJvmArgs(jvmArgs);
-          spec.setSystemProperties(systemProperties);
-          spec.setEnvironment(environment);
+          spec.args(args);
+          spec.jvmArgs(jvmArgs);
+          spec.systemProperties(systemProperties);
+          spec.environment(environment);
           spec.setStandardOutput(call(standardOutput));
           spec.setErrorOutput(call(errorOutput));
+          
+          log.info("using JavaExecSpec {}", spec);
         }
       });
     });
@@ -121,27 +128,23 @@ public class JavaExecFork extends DefaultTask {
     this.stopAfter = stopAfter;
   }
 
-  public void setStandardOutput(String filename) throws FileNotFoundException {
-    this.standardOutput = () -> new FileOutputStream(filename);
+  public void setStandardOutput(Object output) throws FileNotFoundException {
+    if (output instanceof OutputStream) {
+      this.standardOutput = () -> (OutputStream) output;
+    } else if (output instanceof File) {
+      this.standardOutput = () -> new FileOutputStream((File) output);
+    } else {
+      this.standardOutput = () -> new FileOutputStream(output.toString());
+    }
   }
 
-  public void setErrorOutput(String filename) throws FileNotFoundException {
-    this.errorOutput = () -> new FileOutputStream(filename);
+  public void setErrorOutput(Object output) throws FileNotFoundException {
+    if (output instanceof OutputStream) {
+      this.errorOutput = () -> (OutputStream) output;
+    } else if (output instanceof File) {
+      this.errorOutput = () -> new FileOutputStream((File) output);
+    } else {
+      this.errorOutput = () -> new FileOutputStream(output.toString());
+    }
   }
-
-  //public void setStandardOutput(File file) throws FileNotFoundException {
-  //  this.standardOutput = () -> new FileOutputStream(file);
-  //}
-
-  //public void setErrorOutput(File file) throws FileNotFoundException {
-  //  this.errorOutput = () -> new FileOutputStream(file);
-  //}
-
-  //public void setStandardOutput(OutputStream standardOutput) throws FileNotFoundException {
-  //  this.standardOutput = () -> standardOutput;
-  //}
-
-  //public void setErrorOutput(OutputStream errorOutput) throws FileNotFoundException {
-  //  this.errorOutput = () -> errorOutput;
-  //}
 }

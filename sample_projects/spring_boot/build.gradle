@@ -1,0 +1,44 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'gradle-javaexecfork-plugin'
+apply plugin: 'spring-boot'
+
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.pr:gradle-javaexecfork-plugin:0.0.1-SNAPSHOT'
+    classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
+  }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.apache.httpcomponents:fluent-hc:4.5.2'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.0'
+}
+
+task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Main'
+    jvmArgs = [ '-Dserver.port=9201' ]
+    standardOutput = "$buildDir/springboot.log"
+    errorOutput = "$buildDir/springboot-error.log"
+    waitForPort = 9201
+    stopAfter = test
+}
+
+test.dependsOn startDaemon
