@@ -1,2 +1,4 @@
 include 'redirect_output'
+include 'redirect_output_and_error'
 include 'simple'
+include 'spring_boot'

@@ -15,13 +15,24 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
 
+task verify(dependsOn: 'integrationTest') << {
+    assert file("$buildDir/daemon.log").text.contains("PING") == true
+    assert file("$buildDir/daemon.log").text.contains("PONG") == false
+    assert file("$buildDir/daemon-error.log").text.contains("PING") == false
+    assert file("$buildDir/daemon-error.log").text.contains("PONG") == true
+}
+
 task integrationTest(dependsOn: 'startDaemon') << {
     println "I hope the daemon is running"
     Thread.sleep(3*1000)
 }
-build.dependsOn integrationTest
 
 task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
     main = 'Main'
+    standardOutput = "$buildDir/daemon.log"
+    errorOutput = "$buildDir/daemon-error.log"
+    stopAfter = integrationTest
 }
+
+build.dependsOn verify

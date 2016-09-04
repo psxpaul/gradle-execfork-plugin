@@ -13,21 +13,6 @@ public class Main {
   }
 
   public static void main(String[] args) throws Exception {
-//    SpringApplication.run(Main.class, args);
-    Thread t = new Thread(()->{
-      while(true) {
-        try {
-          Thread.sleep(5000);
-        } catch (InterruptedException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
-    });
-    t.setDaemon(true);
-    t.start();
-
-    System.out.println("STARTED!");
-//    System.exit(0);
+    SpringApplication.run(Main.class, args);
   }
 }

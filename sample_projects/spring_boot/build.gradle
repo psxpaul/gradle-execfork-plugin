@@ -34,7 +34,7 @@ task wrapper(type: Wrapper) {
 task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
     main = 'Main'
-    jvmArgs = [ '-Dserver.port=9201' ]
+    jvmArgs = [ 'server.port=9201' ]
     standardOutput = "$buildDir/springboot.log"
     errorOutput = "$buildDir/springboot-error.log"
     waitForPort = 9201

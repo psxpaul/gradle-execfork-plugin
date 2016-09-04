@@ -5,19 +5,18 @@ import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pr.gradle.daemon.Client;
-
 public class JavaExecJoin extends DefaultTask {
   protected static final Logger log = LoggerFactory.getLogger(JavaExecFork.class);
-  private int controlPort;
+  private JavaExecFork forkTask;
 
   @TaskAction
-  public void exec() {
-    new Client(controlPort).sendStopCommand();
+  public void exec() throws InterruptedException {
+    log.info("Stopping '{}' task '{}'", JavaExecFork.class.getSimpleName(), forkTask.getName());
+    forkTask.stop();
   }
   
-  public void setControlPort(int controlPort) {
-    this.controlPort = controlPort;
+  public void setForkTask(JavaExecFork fork) {
+    this.forkTask = fork;
   }
   
   public static String createNameFor(JavaExecFork startTask) {

@@ -17,7 +17,7 @@ task wrapper(type: Wrapper) {
 
 task verify(dependsOn: 'integrationTest') << {
     assert file("$buildDir/daemon.log").text.contains("PING") == true
-    assert file("$buildDir/daemon-error.log").text == ""
+    assert file("$buildDir/daemon.log").text.contains("PONG") == true
 }
 
 task integrationTest(dependsOn: 'startDaemon') << {
@@ -29,7 +29,6 @@ task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
     main = 'Main'
     standardOutput = "$buildDir/daemon.log"
-    errorOutput = "$buildDir/daemon-error.log"
     stopAfter = integrationTest
 }
 
