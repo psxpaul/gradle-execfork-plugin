@@ -1,6 +1,9 @@
 /build/
 /sample_projects/*/build/
+/sample_projects/build/
+/plugin/build/
 .gradle
 .classpath
 .project
 .settings
+*.swp

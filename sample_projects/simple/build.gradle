@@ -1,18 +1,10 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'gradle-javaexecfork-plugin'
 
 buildscript {
-  repositories {
-    mavenLocal()
-  }
   dependencies {
-    classpath 'com.pr:gradle-javaexecfork-plugin:0.0.1-SNAPSHOT'
+    classpath project(':plugin')    // replace this with classpath 'com.pr:gradle-javaexecfork-plugin:0.0.1-SNAPSHOT'
   }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
 }
 
 task integrationTest(dependsOn: 'startDaemon') << {
