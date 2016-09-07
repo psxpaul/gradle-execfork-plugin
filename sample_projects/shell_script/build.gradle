@@ -15,9 +15,9 @@ task verify(dependsOn: 'startDaemon') << {
     assert file("$buildDir/daemon-error.log").text.contains("PONG") == true
 }
 
-task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'com.pr.gradle.example.Main'
+task startDaemon(type: com.pr.gradle.task.ExecFork) {
+    commandLine = './com/pr/gradle/example/Main.sh'
+    workingDir = "$projectDir/src/main/bash"
     standardOutput = "$buildDir/daemon.log"
     errorOutput = "$buildDir/daemon-error.log"
     stopAfter = verify

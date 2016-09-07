@@ -1,19 +1,19 @@
 apply plugin: 'java'
-apply plugin: 'gradle-javaexecfork-plugin'
+apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
   dependencies {
-    classpath project(':plugin')    // replace this with classpath 'com.pr:gradle-javaexecfork-plugin:0.0.1-SNAPSHOT'
+    classpath 'com.pr:gradle-execfork-plugin:0.0.1-SNAPSHOT'
   }
 }
 
 task integrationTest(dependsOn: 'startDaemon') << {
+    sleep(500)
     println "I hope the daemon is running"
-    Thread.sleep(3*1000)
 }
 build.dependsOn integrationTest
 
 task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'Main'
+    main = 'com.pr.gradle.example.Main'
 }

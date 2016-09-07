@@ -1,8 +1,60 @@
-allprojects {
-  group = 'com.pr'
-  version = '0.0.1-SNAPSHOT'
-  buildDir = "build/gradle"
+group = 'com.pr'
+version = '0.0.1-SNAPSHOT'
+buildDir = "build/gradle"
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+dependencies {
+  compile gradleApi()
+
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.hamcrest:hamcrest-core:1.3'
+  testCompile 'org.hamcrest:hamcrest-library:1.3'
 }
+
+eclipse.project.name = 'gradle-execfork-plugin'
+eclipse.classpath.downloadSources = true
+eclipse.classpath.downloadJavadoc = true
+eclipse.jdt.sourceCompatibility=1.8
+eclipse.classpath.defaultOutputDir = file('build/eclipse')
+
+uploadArchives {
+  repositories {
+    mavenLocal()
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+task cleanSampleProjects(type: GradleBuild, dependsOn: uploadArchives) {
+  buildFile = "${project.rootDir}/sample_projects/build.gradle"
+  tasks = [ 'clean' ]
+}
+clean.finalizedBy cleanSampleProjects
+
+task buildSampleProjects(type: GradleBuild, dependsOn: uploadArchives) {
+  buildFile = "${project.rootDir}/sample_projects/build.gradle"
+  tasks = [ 'build' ]
+}
+build.finalizedBy buildSampleProjects
+
+task eclipseSampleProjects(type: GradleBuild) {
+  buildFile = "${project.rootDir}/sample_projects/build.gradle"
+  tasks = [ 'eclipse' ]
+}
+eclipseClasspath.finalizedBy eclipseSampleProjects
+
+task cleanEclipseSampleProjects(type: GradleBuild) {
+  buildFile = "${project.rootDir}/sample_projects/build.gradle"
+  tasks = [ 'cleanEclipse' ]
+}
+cleanEclipse.finalizedBy cleanEclipseSampleProjects
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.0'

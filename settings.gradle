@@ -1,5 +1,1 @@
-include 'plugin'
-include 'sample_projects:redirect_output'
-include 'sample_projects:redirect_output_and_error'
-include 'sample_projects:simple'
-include 'sample_projects:spring_boot'
+rootProject.name = 'gradle-execfork-plugin'
