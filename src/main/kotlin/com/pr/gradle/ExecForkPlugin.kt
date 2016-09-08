@@ -2,6 +2,7 @@ package com.pr.gradle
 
 import com.pr.gradle.task.AbstractExecFork
 import com.pr.gradle.task.ExecJoin
+import com.pr.gradle.task.createNameFor
 import org.gradle.BuildAdapter
 import org.gradle.BuildResult
 import org.gradle.api.Plugin
@@ -19,9 +20,10 @@ class ExecForkPlugin : Plugin<Project> {
 
         project?.tasks?.whenTaskAdded({ task: Task ->
             if (task is AbstractExecFork) {
-                val joinTask:ExecJoin = project.tasks.create(ExecJoin.createNameFor(task), ExecJoin::class.java)
-                joinTask.forkTask = task
-                task.joinTask = joinTask
+                val forkTask:AbstractExecFork = task
+                val joinTask:ExecJoin = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java)
+                joinTask.forkTask = forkTask
+                forkTask.joinTask = joinTask
 
                 forkTasks.add(task)
             }

@@ -5,7 +5,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 
-class JavaExecJoinTest {
+class ExecJoinTest {
     @Test
     fun testCreateNameFor() {
         assertName("startJohnnie", "stopJohnnie")
@@ -35,6 +35,6 @@ class JavaExecJoinTest {
     fun assertName(given:String, expected:String) {
         val project = ProjectBuilder.builder().build()
         val startTask = project.tasks.create(given, JavaExecFork::class.java)
-        assertThat(ExecJoin.createNameFor(startTask), equalTo(expected))
+        assertThat(createNameFor(startTask), equalTo(expected))
     }
 }

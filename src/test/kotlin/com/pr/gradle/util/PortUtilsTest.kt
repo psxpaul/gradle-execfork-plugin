@@ -17,24 +17,24 @@ import java.util.concurrent.TimeUnit
 class PortUtilsTest {
     @Test
     fun testFindOpenPort() {
-        val port = PortUtils.findOpenPort()
+        val port = findOpenPort()
         assertThat(port, greaterThanOrEqualTo(1024))
         assertThat(port, lessThanOrEqualTo(65535))
 
         try {
             Socket(InetAddress.getLoopbackAddress(), port).use { fail("Socket should not have been in use already!") }
         } catch (e:ConnectException) {
-            assertThat(e.message, containsString("Connection refused"));
+            assertThat(e.message, containsString("Connection refused"))
         }
     }
 
     @Test(timeout=2000)
     fun testWaitForPortOpen_timeout() {
         val stubProcess:Process = StubProcess()
-        val port = PortUtils.findOpenPort()
+        val port = findOpenPort()
 
         try {
-            PortUtils.waitForPortOpen(port, 1, TimeUnit.SECONDS, stubProcess)
+            waitForPortOpen(port, 1, TimeUnit.SECONDS, stubProcess)
         } catch (e:Exception) {
             assertThat(e, instanceOf(GradleException::class.java))
             assertThat(e.message, equalTo("Timed out waiting for port $port to be opened"))
@@ -44,10 +44,10 @@ class PortUtilsTest {
     @Test(timeout=2000)
     fun testWaitForPortOpen_processDied() {
         val stubProcess:Process = StubProcess(false)
-        val port = PortUtils.findOpenPort()
+        val port = findOpenPort()
 
         try {
-            PortUtils.waitForPortOpen(port, 1, TimeUnit.MINUTES, stubProcess)
+            waitForPortOpen(port, 1, TimeUnit.MINUTES, stubProcess)
         } catch (e:Exception) {
             assertThat(e, instanceOf(GradleException::class.java))
             assertThat(e.message, equalTo("Process died before port $port was opened"))
@@ -57,7 +57,7 @@ class PortUtilsTest {
     @Test(timeout=2000)
     fun testWaitForPortOpen_success() {
         val stubProcess: Process = StubProcess()
-        val port = PortUtils.findOpenPort()
+        val port = findOpenPort()
         val latch = CountDownLatch(1)
 
         Thread({
@@ -67,9 +67,9 @@ class PortUtilsTest {
             }
         }).start()
 
-        PortUtils.waitForPortOpen(port, 1, TimeUnit.MINUTES, stubProcess)
+        waitForPortOpen(port, 1, TimeUnit.MINUTES, stubProcess)
         latch.await(1, TimeUnit.SECONDS)
-        assertThat(latch.getCount(), equalTo(0L))
+        assertThat(latch.count, equalTo(0L))
     }
 
     class StubProcess(val alive:Boolean = true) : Process() {
@@ -81,7 +81,7 @@ class PortUtilsTest {
         override fun waitFor(): Int { return 0 }
 
         override fun isAlive():Boolean {
-            return alive;
+            return alive
         }
     }
 }
