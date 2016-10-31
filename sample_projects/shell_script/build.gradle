@@ -3,7 +3,7 @@ apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
   dependencies {
-    classpath 'com.pr:gradle-execfork-plugin:0.0.1-SNAPSHOT'
+    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.0.1-SNAPSHOT'
   }
 }
 
@@ -15,8 +15,8 @@ task verify(dependsOn: 'startDaemon') << {
     assert file("$buildDir/daemon-error.log").text.contains("PONG") == true
 }
 
-task startDaemon(type: com.pr.gradle.task.ExecFork) {
-    commandLine = './com/pr/gradle/example/Main.sh'
+task startDaemon(type: com.github.psxpaul.task.ExecFork) {
+    commandLine = './com/github/psxpaul/example/Main.sh'
     workingDir = "$projectDir/src/main/bash"
     standardOutput = "$buildDir/daemon.log"
     errorOutput = "$buildDir/daemon-error.log"

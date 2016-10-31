@@ -4,7 +4,7 @@ apply plugin: 'spring-boot'
 
 buildscript {
   dependencies {
-    classpath 'com.pr:gradle-execfork-plugin:0.0.1-SNAPSHOT'
+    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.0.1-SNAPSHOT'
     classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
   }
 }
@@ -16,9 +16,9 @@ dependencies {
     testCompile 'org.apache.httpcomponents:fluent-hc:4.5.2'
 }
 
-task startDaemon(type: com.pr.gradle.task.JavaExecFork, dependsOn: 'classes') {
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.pr.gradle.example.Main'
+    main = 'com.github.psxpaul.example.Main'
     jvmArgs = [ 'server.port=9201' ]
     standardOutput = "$buildDir/springboot.log"
     errorOutput = "$buildDir/springboot-error.log"
