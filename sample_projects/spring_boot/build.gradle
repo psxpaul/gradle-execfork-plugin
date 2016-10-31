@@ -5,12 +5,12 @@ apply plugin: 'spring-boot'
 buildscript {
   dependencies {
     classpath 'com.github.psxpaul:gradle-execfork-plugin:0.0.1-SNAPSHOT'
-    classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
+    classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE'
   }
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE'
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.apache.httpcomponents:fluent-hc:4.5.2'

@@ -2,6 +2,7 @@
 /sample_projects/*/build/
 /sample_projects/build/
 /plugin/build/
+gradle.properties
 .gradle
 .classpath
 .project
