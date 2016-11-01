@@ -1,5 +1,5 @@
 group = 'com.github.psxpaul'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0'
 buildDir = "build/gradle"
 
 apply plugin: 'kotlin'
@@ -44,6 +44,21 @@ uploadArchives {
         description 'A gradle plugin to execute applications in the background'
         packaging 'jar'
         url 'https://github.com/psxpaul/gradle-execfork-plugin'
+
+        developers {
+          developer {
+            id 'psxpaul'
+            name 'Paul Roberts'
+            email 'psxpaul@gmail.com'
+          }
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
 
         scm {
           connection 'scm:git:git://github.com/psxpaul/gradle-execfork-plugin.git'
