@@ -20,6 +20,9 @@ class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pa
 
         var byte:Int = inputStream.read()
         while(byte != -1) {
+            outputStream.write(byte)
+            outputStream.flush()
+
             if (patternLength == 0 || patternLatch.count == 0L) {
                 log.debug("skipping pattern checking")
             } else if (buffer.size < patternLength) {
@@ -35,8 +38,6 @@ class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pa
                 }
             }
 
-            outputStream.write(byte)
-            outputStream.flush()
             byte = inputStream.read()
         }
         close()

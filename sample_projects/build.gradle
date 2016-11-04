@@ -9,6 +9,8 @@ subprojects {
   eclipse.jdt.sourceCompatibility=1.8
   eclipse.classpath.defaultOutputDir = file('build/eclipse')
 
+  ext.pluginVersion = new File(project.parent.projectDir, '../VERSION').text.trim()
+
   repositories {
     mavenLocal()
     mavenCentral()

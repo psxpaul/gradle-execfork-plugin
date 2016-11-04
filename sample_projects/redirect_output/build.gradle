@@ -3,7 +3,7 @@ apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
   dependencies {
-    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.1.1'
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
   }
 }
 

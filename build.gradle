@@ -1,5 +1,5 @@
 group = 'com.github.psxpaul'
-version = '0.1.1'
+version = new File('VERSION').text.trim()
 buildDir = "build/gradle"
 
 apply plugin: 'kotlin'

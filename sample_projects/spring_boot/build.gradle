@@ -4,7 +4,7 @@ apply plugin: 'spring-boot'
 
 buildscript {
   dependencies {
-    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.1.1'
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
     classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE'
   }
 }
