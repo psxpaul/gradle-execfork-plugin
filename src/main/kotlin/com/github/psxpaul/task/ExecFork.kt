@@ -6,7 +6,7 @@ open class ExecFork : AbstractExecFork() {
     override fun getProcessArgs(): List<String>? {
         val processArgs:MutableList<String> = mutableListOf()
         processArgs.add(commandLine!!)
-        processArgs.addAll(args)
+        processArgs.addAll(args.map(CharSequence::toString))
         return processArgs
     }
 }

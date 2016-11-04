@@ -5,17 +5,22 @@ import org.gradle.internal.jvm.Jvm
 
 open class JavaExecFork : AbstractExecFork() {
     var classpath: FileCollection? = null
-    var main:String? = null
-    var jvmArgs:List<String> = listOf()
+    var main:CharSequence? = null
+    var jvmArgs:List<CharSequence> = listOf()
 
     override fun getProcessArgs(): List<String>? {
         val processArgs:MutableList<String> = mutableListOf()
         processArgs.add(Jvm.current().javaExecutable.absoluteFile.absolutePath)
         processArgs.add("-cp")
         processArgs.add(classpath!!.asPath)
-        processArgs.addAll(jvmArgs.map { s -> if (s.startsWith("-D")) return@map s else "-D" + s })
-        processArgs.add(main!!)
-        processArgs.addAll(args)
+        processArgs.addAll(jvmArgs.map({ s:CharSequence ->
+            if (s.startsWith("-D"))
+                return@map s.toString()
+            else
+                "-D" + s
+        }))
+        processArgs.add(main!!.toString())
+        processArgs.addAll(args.map(CharSequence::toString))
         return processArgs
     }
 }

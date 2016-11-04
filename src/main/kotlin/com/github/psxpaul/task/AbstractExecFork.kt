@@ -1,7 +1,6 @@
 package com.github.psxpaul.task
 
 import com.github.psxpaul.util.waitForPortOpen
-import com.github.psxpaul.util.waitForPortOpen
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Task
@@ -14,11 +13,10 @@ import java.util.concurrent.TimeUnit
 abstract class AbstractExecFork : DefaultTask() {
     val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
-    var workingDir: String = project.projectDir.absolutePath
-    var args: MutableList<String> = mutableListOf()
-    var environment: MutableMap<String, Any> = mutableMapOf()
-    var standardOutput: String? = null
-    var errorOutput: String? = null
+    var workingDir: CharSequence = project.projectDir.absolutePath
+    var args: MutableList<CharSequence> = mutableListOf()
+    var standardOutput: CharSequence? = null
+    var errorOutput: CharSequence? = null
 
     var waitForPort: Int? = null
     var process: Process? = null
@@ -47,9 +45,12 @@ abstract class AbstractExecFork : DefaultTask() {
     fun exec() {
         joinTask ?: throw GradleException("${javaClass.simpleName} task $name did not have a joinTask associated. Make sure you have \"apply plugin: 'gradle-javaexecfork-plugin'\" somewhere in your gradle file")
 
-        val processBuilder:ProcessBuilder = ProcessBuilder(getProcessArgs())
+        val processBuilder: ProcessBuilder = ProcessBuilder(getProcessArgs())
         redirectStreams(processBuilder)
-        processBuilder.directory(File(workingDir))
+
+        val processWorkingDir: File = File(workingDir.toString())
+        processWorkingDir.mkdirs()
+        processBuilder.directory(processWorkingDir)
 
         log.info("running process: {}", processBuilder.command().joinToString(separator = " "))
 
@@ -66,14 +67,24 @@ abstract class AbstractExecFork : DefaultTask() {
         if (standardOutput == null && errorOutput == null) {
             processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT)
         } else if (standardOutput != null && errorOutput == null) {
+            val outputFile: File = File(standardOutput.toString())
+            outputFile.parentFile.mkdirs()
             processBuilder.redirectErrorStream(true)
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(File(standardOutput)))
+            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
         } else if (standardOutput != null && errorOutput != null) {
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(File(standardOutput)))
-            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(File(errorOutput)))
+            val outputFile: File = File(standardOutput.toString())
+            outputFile.parentFile.mkdirs()
+            val errorFile: File = File(errorOutput.toString())
+            errorFile.parentFile.mkdirs()
+
+            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
+            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(errorFile))
         } else {
+            val errorFile: File = File(errorOutput.toString())
+            errorFile.parentFile.mkdirs()
+
             processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(File(errorOutput)))
+            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(errorFile))
         }
     }
 
