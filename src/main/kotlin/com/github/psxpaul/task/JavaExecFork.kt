@@ -13,12 +13,7 @@ open class JavaExecFork : AbstractExecFork() {
         processArgs.add(Jvm.current().javaExecutable.absoluteFile.absolutePath)
         processArgs.add("-cp")
         processArgs.add(classpath!!.asPath)
-        processArgs.addAll(jvmArgs.map({ s:CharSequence ->
-            if (s.startsWith("-D"))
-                return@map s.toString()
-            else
-                "-D" + s
-        }))
+        processArgs.addAll(jvmArgs.map(CharSequence::toString))
         processArgs.add(main!!.toString())
         processArgs.addAll(args.map(CharSequence::toString))
         return processArgs
