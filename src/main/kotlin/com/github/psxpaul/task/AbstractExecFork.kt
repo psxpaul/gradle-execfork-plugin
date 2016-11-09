@@ -20,6 +20,7 @@ abstract class AbstractExecFork : DefaultTask() {
 
     var waitForPort: Int? = null
     var process: Process? = null
+    var timeout: Long = 60
 
     var stopAfter: Task? = null
         set(value: Task?) {
@@ -58,7 +59,7 @@ abstract class AbstractExecFork : DefaultTask() {
 
         val waitForPortVal:Int? = waitForPort
         if (waitForPortVal != null)
-            waitForPortOpen(waitForPortVal, 60, TimeUnit.SECONDS, process!!)
+            waitForPortOpen(waitForPortVal, timeout, TimeUnit.SECONDS, process!!)
     }
 
     abstract fun getProcessArgs(): List<String>?
