@@ -8,6 +8,14 @@ import java.io.InputStream
 import java.util.LinkedList
 import java.util.concurrent.CountDownLatch
 
+/**
+ * Object that will copy the inputStream to the outputFile. You can optionally call waitForPattern()
+ * to block until the pattern is seen in the outputFile
+ *
+ * @param inputStream the InputStream to copy to the outputFile
+ * @param outputFile the outputFile to copy to
+ * @param pattern the optional pattern to wait for when calling waitForPattern()
+ */
 class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pattern: String?) : AutoCloseable {
     val log: Logger = LoggerFactory.getLogger(InputStreamPipe::class.java)
 
@@ -46,10 +54,16 @@ class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pa
         thread.start()
     }
 
+    /**
+     * Block until the pattern has been seen in the InputStream
+     */
     fun waitForPattern() {
         patternLatch.await()
     }
 
+    /**
+     * Close the outputFile
+     */
     override fun close() {
         log.debug("closing file ${outputFile.absolutePath}")
         outputStream.close()

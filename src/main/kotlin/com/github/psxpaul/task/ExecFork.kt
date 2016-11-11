@@ -1,5 +1,14 @@
 package com.github.psxpaul.task
 
+/**
+ * A task that will run a command in a separate process, optionally
+ * writing stdout and stderr to disk, and waiting for a specified
+ * port to be open.
+ *
+ * @see AbstractExecFork
+ *
+ * @param commandLine the path to the executable to run
+ */
 open class ExecFork : AbstractExecFork() {
     var commandLine:String? = null
 

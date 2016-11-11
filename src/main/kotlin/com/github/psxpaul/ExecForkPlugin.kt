@@ -12,6 +12,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
 
+/**
+ * Gradle plugin that will allow for 'com.github.psxpaul.ExecFork' and 'com.github.psxpaul.JavaExecFork' task
+ * types. This plugin will make sure all of those tasks are stopped when a build completes, and optionally
+ * create stop tasks for each one that specifies a 'stopAfter' task.
+ *
+ * Note: it is important to apply this plugin to your project for your ExecFork and JavaExecFork tasks to
+ * work. E.g.:
+ *          apply plugin: 'gradle-execfork-plugin'
+ */
 class ExecForkPlugin : Plugin<Project> {
     val log: Logger = LoggerFactory.getLogger(ExecForkPlugin::class.java)
 

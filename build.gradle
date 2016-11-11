@@ -12,13 +12,13 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.4'
+    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.5'
   }
 }
 
 dependencies {
   compile gradleApi()
-  compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.4'
+  compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.5'
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.hamcrest:hamcrest-all:1.3'

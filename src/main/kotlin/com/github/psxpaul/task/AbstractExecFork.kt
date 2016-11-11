@@ -10,6 +10,25 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 
+/**
+ * An abstract task that will launch an executable as a background process, optionally
+ * waiting until a specific port is opened. The task will also stop the process if given
+ * a stopAfter or joinTask
+ *
+ * @see ExecFork
+ * @see JavaExecFork
+ *
+ * @param workingDir the working directory that the process is run from
+ * @param args the arguments to give the executable
+ * @param standardOutput the name of the file to write the process's standard output to
+ * @param errorOutput the name of the file to write the process's error output to
+ * @param waitForPort if specified, block the task from completing until the given port is
+ *                 open locally
+ * @param timeout the length of time in seconds that the task will wait for the port to be
+ *                 be opened, before failing
+ * @param stopAfter if specified, this task will stop the running process after the stopAfter
+ *                 task has been completed
+ */
 abstract class AbstractExecFork : DefaultTask() {
     val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
@@ -89,6 +108,9 @@ abstract class AbstractExecFork : DefaultTask() {
         }
     }
 
+    /**
+     * Stop the process that this task has spawned
+     */
     fun stop() {
         if (process != null && process!!.isAlive)
             process!!.destroyForcibly().waitFor(15, TimeUnit.SECONDS)

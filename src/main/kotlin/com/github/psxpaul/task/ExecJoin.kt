@@ -5,6 +5,14 @@ import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ * A gradle task that is linked to an AbstractExecTask, that will
+ * call AbstractExecTask.stop() when this task is run. You should
+ * not need to create these tasks, as the ExecForkPlugin will create
+ * them for any AbstractExecTask that has a stopAfter task specified.
+ *
+ * @param forkTask the task to call stop() on
+ */
 open class ExecJoin() : DefaultTask() {
     val log: Logger = LoggerFactory.getLogger(ExecJoin::class.java)
 
@@ -17,6 +25,16 @@ open class ExecJoin() : DefaultTask() {
     }
 }
 
+/**
+ * Create a human-readable name for an ExecJoin task, given a corresponding
+ * AbstractExecFork task.
+ *
+ * @return a human-readable string for an ExecJoin task
+ * e.g.
+ * startFoo -> stopFoo
+ * runJob -> stopJob
+ * execPoodleDaemon -> stopPoodleDaemon
+ */
 fun createNameFor(startTask: AbstractExecFork):String {
     val taskName:String = startTask.name
 
