@@ -49,7 +49,8 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
 ```
 
 ### Supported Properties
-ExecFork:
+####ExecFork:
+
 Name | Type | Description
 --- | --- | ---
 workingDir | String | *Optional.* The path of the working directory to run the executable from. This is treated as a relative path, so specifying an absolute path should be preferred. Default: `project.projectDir.absolutePath`
@@ -61,7 +62,8 @@ timeout | Long | *Optional.* The maximum number of seconds associated with the w
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
 commandLine | String | *Required.* The path to the executable.
 
-JavaExecFork:
+####JavaExecFork:
+
 Name | Type | Description
 --- | --- | ---
 workingDir | String | *Optional.* The path of the working directory to run the executable from. This is treated as a relative path, so specifying an absolute path should be preferred. Default: `project.projectDir.absolutePath`
