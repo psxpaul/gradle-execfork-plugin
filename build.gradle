@@ -1,71 +1,32 @@
+plugins {
+  id 'com.gradle.plugin-publish' version '0.9.7'
+  id 'org.jetbrains.kotlin.jvm' version '1.1.2-2'
+  id 'idea'
+  id 'maven'
+}
+
 group = 'com.github.psxpaul'
 version = new File('VERSION').text.trim()
 buildDir = "build/gradle"
 
-apply plugin: 'kotlin'
-apply plugin: 'idea'
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.5'
-  }
-}
-
 dependencies {
   compile gradleApi()
-  compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.5'
+  compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.2'
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
 
-uploadArchives {
-  repositories {
-    mavenLocal()
+pluginBundle {
+  website = 'http://github.com/psxpaul'
+  vcsUrl = 'https://github.com/psxpaul/gradle-execfork-plugin'
+  description = 'Execute Java or shell processes in the background during a build'
+  tags = ['java', 'exec', 'background', 'process']
 
-    mavenDeployer {
-      beforeDeployment{ MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: project.properties['ossrhUser'], password: project.properties['ossrhPassword'])
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: project.properties['ossrhUser'], password: project.properties['ossrhPassword'])
-      }
-
-      pom.project {
-        name 'Gradle-Execfork-Plugin'
-        description 'A gradle plugin to execute applications in the background'
-        packaging 'jar'
-        url 'https://github.com/psxpaul/gradle-execfork-plugin'
-
-        developers {
-          developer {
-            id 'psxpaul'
-            name 'Paul Roberts'
-            email 'psxpaul@gmail.com'
-          }
-        }
-
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-        }
-
-        scm {
-          connection 'scm:git:git://github.com/psxpaul/gradle-execfork-plugin.git'
-          developerConnection 'scm:git:git@github.com:psxpaul/gradle-execfork-plugin.git'
-          url 'https://github.com/psxpaul/gradle-execfork-plugin'
-        }
-      }
+  plugins {
+    greetingsPlugin {
+      id = 'com.github.psxpaul.execfork'
+      displayName = 'Gradle Exec Fork Plugin'
     }
   }
 }
@@ -98,14 +59,9 @@ task sourcesJar(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '3.1'
+  gradleVersion = '3.5'
 }
 
 artifacts {
   archives javadocJar, sourcesJar
-}
-
-signing {
-  required { gradle.taskGraph.hasTask("uploadArchives") }
-  sign configurations.archives
 }

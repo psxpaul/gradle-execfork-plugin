@@ -7,13 +7,15 @@ buildscript {
   }
 }
 
-task integrationTest(dependsOn: 'startDaemon') << {
+task integrationTest(dependsOn: 'startDaemon') {
+  doLast {
     sleep(500)
     println "I hope the daemon is running"
+  }
 }
 build.dependsOn integrationTest
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'com.github.psxpaul.example.Main'
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
 }

@@ -8,4 +8,5 @@ gradle.properties
 .project
 .settings
 .idea
+*.iml
 *.swp

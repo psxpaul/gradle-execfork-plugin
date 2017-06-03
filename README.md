@@ -6,12 +6,8 @@ Gradle plugin for running background processes during a build. Both standard exe
 For running a standard executable:
 
 ```groovy
-apply plugin: 'gradle-execfork-plugin'
-
-buildscript {
-  dependencies {
-    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.1.4'
-  }
+plugins {
+  id 'com.github.psxpaul.execfork' version '0.1.5'
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
@@ -28,12 +24,8 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
 For running a java main class:
 
 ```groovy
-apply plugin: 'gradle-execfork-plugin'
-
-buildscript {
-  dependencies {
-    classpath 'com.github.psxpaul:gradle-execfork-plugin:0.1.4'
-  }
+plugins {
+  id 'com.github.psxpaul.execfork' version '0.1.5'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
@@ -49,7 +41,7 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
 ```
 
 ### Supported Properties
-####ExecFork:
+#### ExecFork:
 
 Name | Type | Description
 --- | --- | ---
@@ -62,7 +54,7 @@ timeout | Long | *Optional.* The maximum number of seconds associated with the w
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
 commandLine | String | *Required.* The path to the executable.
 
-####JavaExecFork:
+#### JavaExecFork:
 
 Name | Type | Description
 --- | --- | ---
@@ -77,5 +69,5 @@ classpath | org.gradle.api.file.FileCollection | *Required.* The classpath to us
 main | String | *Required.* The qualified name of the main java class to execute.
 jvmArgs | List<String> | *Optional.* The list of arguments to give to the jvm when launching the java main class.
 
-#TODO:
+# TODO:
  - add a waitForOutput option

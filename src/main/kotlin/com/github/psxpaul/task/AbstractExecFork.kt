@@ -79,6 +79,13 @@ abstract class AbstractExecFork : DefaultTask() {
         val waitForPortVal:Int? = waitForPort
         if (waitForPortVal != null)
             waitForPortOpen(waitForPortVal, timeout, TimeUnit.SECONDS, process!!)
+
+        val task:AbstractExecFork = this
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            override fun run() {
+                task.stop()
+            }
+        })
     }
 
     abstract fun getProcessArgs(): List<String>?

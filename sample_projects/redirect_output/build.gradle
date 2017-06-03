@@ -7,17 +7,19 @@ buildscript {
   }
 }
 
-task verify(dependsOn: 'startDaemon') << {
+task verify(dependsOn: 'startDaemon') {
+  doLast {
     sleep(250)
     assert file("$buildDir/daemon.log").text.contains("PING") == true
     assert file("$buildDir/daemon.log").text.contains("PONG") == true
+  }
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'com.github.psxpaul.example.Main'
-    standardOutput = "$buildDir/daemon.log"
-    stopAfter = verify
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
+  standardOutput = "$buildDir/daemon.log"
+  stopAfter = verify
 }
 
 build.dependsOn verify

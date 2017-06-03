@@ -1,0 +1,25 @@
+plugins {
+  id 'org.springframework.boot' version '1.5.3.RELEASE'
+  id 'com.github.psxpaul.execfork' version '0.1.5'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  testCompile 'junit:junit'
+  testCompile 'org.hamcrest:hamcrest-library'
+  testCompile 'org.apache.httpcomponents:fluent-hc:4.5.2'
+}
+
+task startDaemon(type: com.github.psxpaul.task.ExecFork) {
+  commandLine = './com/github/psxpaul/example/Main.sh'
+  workingDir = "$projectDir/src/main/bash"
+  standardOutput = "$buildDir/daemon.log"
+  errorOutput = "$buildDir/daemon-error.log"
+  stopAfter = bootRun
+}
+
+bootRun.dependsOn startDaemon
