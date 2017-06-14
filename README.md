@@ -30,6 +30,7 @@ plugins {
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
     classpath = sourceSets.main.runtimeClasspath
+    main = 'com.sample.application.MainApp'
     args = [ '-d', '/foo/bar/data', '-v', '-l', '3' ]
     jvmArgs = [ '-Xmx500m', '-Djava.awt.headless=true' ]
     workingDir = "$buildDir/server"
