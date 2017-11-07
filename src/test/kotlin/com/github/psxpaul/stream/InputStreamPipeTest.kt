@@ -13,13 +13,13 @@ class InputStreamPipeTest {
     val outputStream: PipedOutputStream = PipedOutputStream()
     val outputBuffer: BufferedWriter = outputStream.bufferedWriter()
     val inputStream: InputStream = PipedInputStream(outputStream)
-    val outputFile: File = File.createTempFile(javaClass.simpleName, ".out")
+    val pipeOutput = ByteArrayOutputStream()
     val waitForPattern = "Server Started!"
-    val logger = InputStreamPipe(inputStream, outputFile, waitForPattern)
+    val logger = InputStreamPipe(inputStream, pipeOutput, waitForPattern)
     val latch: CountDownLatch = CountDownLatch(1)
 
     @Test
-    fun shouldCopyInputStreamToFile() {
+    fun shouldCopyInputStreamToOutputStream() {
         Thread({ ->
             writeLine("Line One", 100)
             writeLine("Line Two", 100)
@@ -32,17 +32,17 @@ class InputStreamPipeTest {
         }).start()
         logger.waitForPattern()
 
-        val outputFileContents:List<String> = FileReader(outputFile).readLines()
+        val outputFileContents:List<String> = String(pipeOutput.toByteArray()).split("\n")
         val msg = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
-        assertThat(msg, outputFileContents, hasSize(5))
-        assertThat(msg, outputFileContents, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!"))
+        assertThat(msg, outputFileContents, hasSize(6))
+        assertThat(msg, outputFileContents, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", ""))
 
         latch.await()
 
-        val outputFileContentsTwo:List<String> = FileReader(outputFile).readLines()
+        val outputFileContentsTwo:List<String> = String(pipeOutput.toByteArray()).split("\n")
         val msgTwo = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
-        assertThat(msgTwo, outputFileContentsTwo, hasSize(7))
-        assertThat(msgTwo, outputFileContentsTwo, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", "Line Five", "Line Six"))
+        assertThat(msgTwo, outputFileContentsTwo, hasSize(8))
+        assertThat(msgTwo, outputFileContentsTwo, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", "Line Five", "Line Six", ""))
     }
 
     @After
