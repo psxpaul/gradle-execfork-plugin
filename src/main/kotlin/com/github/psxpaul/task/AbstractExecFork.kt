@@ -1,5 +1,6 @@
 package com.github.psxpaul.task
 
+import com.github.psxpaul.stream.InputStreamPipe
 import com.github.psxpaul.util.waitForPortOpen
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -8,6 +9,7 @@ import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 /**
@@ -34,10 +36,12 @@ abstract class AbstractExecFork : DefaultTask() {
 
     var workingDir: CharSequence = project.projectDir.absolutePath
     var args: MutableList<CharSequence> = mutableListOf()
-    var standardOutput: CharSequence? = null
-    var errorOutput: CharSequence? = null
+    var standardOutput: String? = null
+    var errorOutput: String? = null
 
     var waitForPort: Int? = null
+    var waitForOutput: String? = null
+    var waitForError: String? = null
     var process: Process? = null
     var timeout: Long = 60
 
@@ -75,6 +79,7 @@ abstract class AbstractExecFork : DefaultTask() {
         log.info("running process: {}", processBuilder.command().joinToString(separator = " "))
 
         this.process = processBuilder.start()
+        installPipesAndWait(this.process!!)
 
         val waitForPortVal:Int? = waitForPort
         if (waitForPortVal != null)
@@ -90,29 +95,24 @@ abstract class AbstractExecFork : DefaultTask() {
 
     abstract fun getProcessArgs(): List<String>?
 
-    private fun redirectStreams(processBuilder:ProcessBuilder) {
-        if (standardOutput == null && errorOutput == null) {
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT)
-        } else if (standardOutput != null && errorOutput == null) {
-            val outputFile: File = File(standardOutput.toString())
-            outputFile.parentFile.mkdirs()
-            processBuilder.redirectErrorStream(true)
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
-        } else if (standardOutput != null && errorOutput != null) {
-            val outputFile: File = File(standardOutput.toString())
-            outputFile.parentFile.mkdirs()
-            val errorFile: File = File(errorOutput.toString())
-            errorFile.parentFile.mkdirs()
+    private fun installPipesAndWait(process:Process) {
+        val processOut = if(standardOutput != null) {
+            File(standardOutput).parentFile.mkdirs()
+            FileOutputStream(standardOutput)
+        } else System.out
+        val outPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
+        if(errorOutput != null) {
+            File(errorOutput).parentFile.mkdirs()
 
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
-            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(errorFile))
-        } else {
-            val errorFile: File = File(errorOutput.toString())
-            errorFile.parentFile.mkdirs()
-
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-            processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(errorFile))
+            val errPipe = InputStreamPipe(process.errorStream, FileOutputStream(errorOutput), waitForError)
+            errPipe.waitForPattern(timeout, TimeUnit.SECONDS)
         }
+        outPipe.waitForPattern(timeout, TimeUnit.SECONDS)
+    }
+
+    private fun redirectStreams(processBuilder:ProcessBuilder) {
+        if(errorOutput == null)
+            processBuilder.redirectErrorStream(true)
     }
 
     /**

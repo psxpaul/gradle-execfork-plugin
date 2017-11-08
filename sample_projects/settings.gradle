@@ -4,4 +4,5 @@ include 'shell_script'
 include 'simple'
 include 'spring_boot'
 //include 'spring_boot_with_dependency'  test this project manually :-( (run `gradle bootRun`, then press ctrl-c)
+include 'wait_output'
 include 'war'

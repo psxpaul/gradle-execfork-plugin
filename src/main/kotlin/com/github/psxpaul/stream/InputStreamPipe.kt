@@ -5,26 +5,26 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.io.OutputStream
 import java.util.LinkedList
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
- * Object that will copy the inputStream to the outputFile. You can optionally call waitForPattern()
- * to block until the pattern is seen in the outputFile
+ * Object that will copy the inputStream to the outputStream. You can optionally call waitForPattern()
+ * to block until the pattern is seen in the given stream
  *
  * @param inputStream the InputStream to copy to the outputFile
- * @param outputFile the outputFile to copy to
+ * @param outputStream the outputStream to copy to
  * @param pattern the optional pattern to wait for when calling waitForPattern()
  */
-class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pattern: String?) : AutoCloseable {
+class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStream, val pattern: String?) : AutoCloseable {
     val log: Logger = LoggerFactory.getLogger(InputStreamPipe::class.java)
 
-    val outputStream: FileOutputStream = FileOutputStream(outputFile)
     val patternLength: Int = if (pattern != null) pattern.toByteArray().size else 0
     val patternLatch: CountDownLatch = CountDownLatch(if (pattern != null) 1 else 0)
     val buffer: LinkedList<Int> = LinkedList()
     val thread: Thread = Thread({
-        log.debug("writing to ${outputFile.absolutePath}")
 
         var byte:Int = inputStream.read()
         while(byte != -1) {
@@ -62,10 +62,20 @@ class InputStreamPipe(val inputStream: InputStream, val outputFile: File, val pa
     }
 
     /**
+     * Block until the pattern has been seen in the InputStream
+     *
+     * @param timeout the maximum number of TimeUnits to wait
+     * @param unit the unit of time to wait
+     */
+    fun waitForPattern(timeout:Long, unit: TimeUnit) {
+        patternLatch.await(timeout, unit)
+    }
+
+    /**
      * Close the outputFile
      */
     override fun close() {
-        log.debug("closing file ${outputFile.absolutePath}")
+        log.debug("closing given outputstream")
         outputStream.close()
     }
 }
