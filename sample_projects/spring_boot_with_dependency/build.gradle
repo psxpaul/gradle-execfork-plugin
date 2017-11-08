@@ -1,6 +1,6 @@
 plugins {
   id 'org.springframework.boot' version '1.5.3.RELEASE'
-  id 'com.github.psxpaul.execfork' version '0.1.5'
+  id 'com.github.psxpaul.execfork' version '0.1.6'
 }
 
 repositories {
