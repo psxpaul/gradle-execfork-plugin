@@ -1,0 +1,10 @@
+apply plugin: 'java'
+apply from: 'gradle/exec.gradle'
+
+task integrationTest(dependsOn: 'startDaemon') {
+  doLast {
+    sleep(500)
+    println "I hope the daemon is running"
+  }
+}
+build.dependsOn integrationTest

@@ -1,3 +1,4 @@
+include 'apply_from'
 include 'redirect_output'
 include 'redirect_output_and_error'
 include 'shell_script'

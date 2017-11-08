@@ -1,0 +1,16 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
+  }
+}
+
+apply plugin: com.github.psxpaul.ExecForkPlugin
+
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
+}
