@@ -19,6 +19,7 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
     stopAfter = verify
     waitForPort = 8080
     waitForOutput = 'has started'
+    environment 'JAVA_HOME', "$buildDir/java"
 }
 ```
 
@@ -40,6 +41,7 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
     stopAfter = verify
     waitForPort = 8443
     waitForOutput = 'has started'
+    environment 'JAVA_HOME', "$buildDir/java"
 }
 ```
 
@@ -57,6 +59,7 @@ waitForOutput | String | *Optional.* A string to look for in standardOutput. The
 timeout | Long | *Optional.* The maximum number of seconds associated with the waitForPort or waitForOutput task. Default: `60`
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
 commandLine | String | *Required.* The path to the executable.
+
 
 #### JavaExecFork:
 

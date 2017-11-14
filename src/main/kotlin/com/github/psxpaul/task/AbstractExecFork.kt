@@ -1,6 +1,7 @@
 package com.github.psxpaul.task
 
 import com.github.psxpaul.stream.InputStreamPipe
+import com.github.psxpaul.stream.OutputStreamLogger
 import com.github.psxpaul.util.waitForPortOpen
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -38,6 +39,7 @@ abstract class AbstractExecFork : DefaultTask() {
     var args: MutableList<CharSequence> = mutableListOf()
     var standardOutput: String? = null
     var errorOutput: String? = null
+    private val environment = mutableMapOf<String, String>()
 
     var waitForPort: Int? = null
     var waitForOutput: String? = null
@@ -76,6 +78,8 @@ abstract class AbstractExecFork : DefaultTask() {
         processWorkingDir.mkdirs()
         processBuilder.directory(processWorkingDir)
 
+        processBuilder.environment().putAll(environment)
+
         log.info("running process: {}", processBuilder.command().joinToString(separator = " "))
 
         this.process = processBuilder.start()
@@ -96,10 +100,10 @@ abstract class AbstractExecFork : DefaultTask() {
     abstract fun getProcessArgs(): List<String>?
 
     private fun installPipesAndWait(process:Process) {
-        val processOut = if(standardOutput != null) {
+        val processOut = if(!standardOutput.isNullOrBlank()) {
             File(standardOutput).parentFile.mkdirs()
             FileOutputStream(standardOutput)
-        } else System.out
+        } else OutputStreamLogger(project.logger)
         val outPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
         if(errorOutput != null) {
             File(errorOutput).parentFile.mkdirs()
@@ -113,6 +117,13 @@ abstract class AbstractExecFork : DefaultTask() {
     private fun redirectStreams(processBuilder:ProcessBuilder) {
         if(errorOutput == null)
             processBuilder.redirectErrorStream(true)
+    }
+
+    /**
+     * Adds an environment variable to the process
+     */
+    fun environment(name:String, value:String) {
+        environment.put(name, value)
     }
 
     /**
