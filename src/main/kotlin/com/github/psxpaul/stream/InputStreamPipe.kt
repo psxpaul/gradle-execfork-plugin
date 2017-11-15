@@ -1,5 +1,6 @@
 package com.github.psxpaul.stream
 
+import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -68,7 +69,9 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
      * @param unit the unit of time to wait
      */
     fun waitForPattern(timeout:Long, unit: TimeUnit) {
-        patternLatch.await(timeout, unit)
+        if(!patternLatch.await(timeout, unit)) {
+            throw GradleException("The waitForOutput pattern did not appear before timeout was reached.")
+        }
     }
 
     /**
