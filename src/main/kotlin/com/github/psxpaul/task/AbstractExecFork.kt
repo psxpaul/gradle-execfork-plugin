@@ -39,7 +39,10 @@ abstract class AbstractExecFork : DefaultTask() {
     var args: MutableList<CharSequence> = mutableListOf()
     var standardOutput: String? = null
     var errorOutput: String? = null
-    private val environment = mutableMapOf<String, String>()
+    var environment: MutableMap<CharSequence, CharSequence> = mutableMapOf()
+        set(value) {
+            field.putAll(value)
+        }
 
     var waitForPort: Int? = null
     var waitForOutput: String? = null
@@ -78,7 +81,7 @@ abstract class AbstractExecFork : DefaultTask() {
         processWorkingDir.mkdirs()
         processBuilder.directory(processWorkingDir)
 
-        processBuilder.environment().putAll(environment)
+        environment.forEach { processBuilder.environment().put(it.key.toString(), it.value.toString()) }
 
         log.info("running process: {}", processBuilder.command().joinToString(separator = " "))
 

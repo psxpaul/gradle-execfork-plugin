@@ -36,7 +36,7 @@ class ExecForkPlugin : Plugin<Project> {
 
                 forkTasks.add(task)
             }
-        });
+        })
 
         project?.gradle?.addBuildListener(object: BuildAdapter() {
             override fun buildFinished(result: BuildResult?) {
@@ -48,6 +48,6 @@ class ExecForkPlugin : Plugin<Project> {
                     }
                 }
             }
-        });
+        })
     }
 }

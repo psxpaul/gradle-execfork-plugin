@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'gradle-execfork-plugin'
+
+buildscript {
+  dependencies {
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
+  }
+}
+
+task verify(dependsOn: 'startDaemon') {
+  doLast {
+    sleep(250)
+    assert file("$buildDir/daemon.log").text.contains("VAR_ONE = $buildDir/value_one") == true
+    assert file("$buildDir/daemon.log").text.contains("VAR_TWO = $buildDir/value_two") == true
+    assert file("$buildDir/daemon.log").text.contains("VAR_THREE = /tmp/value_three") == true
+  }
+}
+
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
+  standardOutput = "$buildDir/daemon.log"
+  environment = ['VAR_TWO': "$buildDir/value_two", 'VAR_THREE': "/tmp/value_three"]
+  environment 'VAR_ONE', "$buildDir/value_one"
+  stopAfter = verify
+}
+
+build.dependsOn verify

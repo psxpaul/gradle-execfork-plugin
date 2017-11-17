@@ -7,7 +7,7 @@ For running a standard executable:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.6'
+  id 'com.github.psxpaul.execfork' version '0.1.7'
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
@@ -19,7 +19,7 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
     stopAfter = verify
     waitForPort = 8080
     waitForOutput = 'has started'
-    environment 'JAVA_HOME', "$buildDir/java"
+    environment = ['JAVA_HOME': "$buildDir/java", 'USER_HOME': "$buildDir/userhome"]
 }
 ```
 
@@ -27,7 +27,7 @@ For running a java main class:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.6'
+  id 'com.github.psxpaul.execfork' version '0.1.7'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
@@ -59,6 +59,7 @@ waitForOutput | String | *Optional.* A string to look for in standardOutput. The
 timeout | Long | *Optional.* The maximum number of seconds associated with the waitForPort or waitForOutput task. Default: `60`
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
 commandLine | String | *Required.* The path to the executable.
+environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the executable with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
 
 
 #### JavaExecFork:
@@ -76,4 +77,5 @@ stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will c
 classpath | org.gradle.api.file.FileCollection | *Required.* The classpath to use to launch the java main class.
 main | String | *Required.* The qualified name of the main java class to execute.
 jvmArgs | List<String> | *Optional.* The list of arguments to give to the jvm when launching the java main class.
+environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the java main class with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
 
