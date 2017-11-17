@@ -42,7 +42,7 @@ class ExecForkPlugin : Plugin<Project> {
             override fun buildFinished(result: BuildResult?) {
                 for (forkTask: AbstractExecFork in forkTasks) {
                     try {
-                        forkTask.stop();
+                        forkTask.stop()
                     } catch (e:InterruptedException) {
                         log.error("Error stopping daemon for {} task '{}'", forkTask.javaClass.simpleName, forkTask.name, e);
                     }
