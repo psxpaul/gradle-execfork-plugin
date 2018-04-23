@@ -1,13 +1,11 @@
 package com.github.psxpaul.stream
 
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.hamcrest.Matchers.hasSize
-import org.hamcrest.Matchers.contains
 import org.junit.After
 import java.io.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class InputStreamPipeTest {
     val outputStream: PipedOutputStream = PipedOutputStream()
@@ -20,30 +18,45 @@ class InputStreamPipeTest {
 
     @Test
     fun shouldCopyInputStreamToOutputStream() {
-        Thread({ ->
-            writeLine("Line One", 100)
-            writeLine("Line Two", 100)
-            writeLine("Line Three", 100)
-            writeLine("Line Four", 100)
-            writeLine("Server Started!", 500)
-            writeLine("Line Five", 100)
-            writeLine("Line Six", 100)
+        shouldFindPatternFromLines("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", "Line Five", "Line Six")
+    }
+
+    @Test
+    fun shouldFindInLastLine() {
+        shouldFindPatternFromLines("Line One", "Line Two", "Server Started!")
+    }
+
+    @Test
+    fun shouldFindInFirstLine() {
+        shouldFindPatternFromLines("Server Started!","Line Two","Line Three")
+    }
+
+    private fun shouldFindPatternFromLines(vararg lines: String) {
+        Thread({
+            lines.forEach { line -> writeLine(line, 100) }
             latch.countDown()
         }).start()
         logger.waitForPattern()
 
-        val outputFileContents:List<String> = String(pipeOutput.toByteArray()).split("\n")
+        val outputFileContents:List<String> = splitAndRemoveExtraEmptyString()
         val msg = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
-        assertThat(msg, outputFileContents, hasSize(6))
-        assertThat(msg, outputFileContents, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", ""))
+
+        assertThat(msg, outputFileContents, `is`(allLinesUntilPattern(lines)))
 
         latch.await()
 
-        val outputFileContentsTwo:List<String> = String(pipeOutput.toByteArray()).split("\n")
+        val outputFileContentsTwo:List<String> = splitAndRemoveExtraEmptyString()
         val msgTwo = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
-        assertThat(msgTwo, outputFileContentsTwo, hasSize(8))
-        assertThat(msgTwo, outputFileContentsTwo, contains("Line One", "Line Two", "Line Three", "Line Four", "Server Started!", "Line Five", "Line Six", ""))
+        assertThat(msgTwo, outputFileContentsTwo, contains(*lines))
     }
+
+    private fun allLinesUntilPattern(lines: Array<out String>): List<String> {
+        val takeWhile: MutableList<String> = lines.takeWhile { i -> i != "Server Started!" }.toMutableList()
+        takeWhile.add("Server Started!")
+        return takeWhile.toList()
+    }
+
+    private fun splitAndRemoveExtraEmptyString() = String(pipeOutput.toByteArray()).split("\n").filter { i -> i != "" }
 
     @After
     fun cleanup() {

@@ -34,17 +34,17 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
 
             if (patternLength == 0 || patternLatch.count == 0L) {
                 log.debug("skipping pattern checking")
-            } else if (buffer.size < patternLength) {
+            } else if (buffer.size < patternLength-1) {
                 buffer.addLast(byte)
             } else {
-                buffer.removeFirst()
                 buffer.addLast(byte)
+                val bufferStr = String(buffer.map(Int::toByte).toByteArray())
 
-                val bufferStr: String = String(buffer.map(Int::toByte).toByteArray())
                 log.debug("checking if |${bufferStr.replace("\n", "\\n")}| equals |$pattern|")
                 if (bufferStr == pattern) {
                     patternLatch.countDown()
                 }
+                buffer.removeFirst()
             }
 
             byte = inputStream.read()
