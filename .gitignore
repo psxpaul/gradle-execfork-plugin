@@ -10,3 +10,4 @@ gradle.properties
 .idea
 *.iml
 *.swp
+.DS_Store
