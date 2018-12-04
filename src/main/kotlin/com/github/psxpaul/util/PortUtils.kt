@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
  * Find a random port that is available to listen on
  * @return a port number that is available
  */
-fun findOpenPort():Int {
+fun findOpenPort(): Int {
     ServerSocket(0).use { return it.localPort }
 }
 
@@ -17,10 +17,10 @@ fun findOpenPort():Int {
  * @param port the port number to check
  * @return true if the port is open, false otherwise
  */
-private fun isPortOpen(port:Int):Boolean {
+private fun isPortOpen(port: Int): Boolean {
     Socket().use {
         val inetAddress: InetAddress = InetAddress.getByName("127.0.0.1")
-        val socketAddress: InetSocketAddress = InetSocketAddress(inetAddress, port)
+        val socketAddress = InetSocketAddress(inetAddress, port)
         try {
             it.connect(socketAddress)
             return true;
@@ -46,9 +46,9 @@ private fun isPortOpen(port:Int):Boolean {
  *          not open, OR the given process has terminated before the port is
  *          opened (whichever occurs first)
  */
-fun waitForPortOpen(port:Int, timeout:Long, unit: TimeUnit, process:Process) {
-    val millisToWait:Long = unit.toMillis(timeout)
-    val waitUntil:Long = System.currentTimeMillis() + millisToWait
+fun waitForPortOpen(port: Int, timeout: Long, unit: TimeUnit, process: Process) {
+    val millisToWait: Long = unit.toMillis(timeout)
+    val waitUntil: Long = System.currentTimeMillis() + millisToWait
 
     while (System.currentTimeMillis() < waitUntil) {
         Thread.sleep(100)

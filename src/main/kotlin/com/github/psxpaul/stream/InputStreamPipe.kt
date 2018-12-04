@@ -3,11 +3,9 @@ package com.github.psxpaul.stream
 import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.LinkedList
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -25,16 +23,16 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
     val patternLength: Int = if (pattern != null) pattern.toByteArray().size else 0
     val patternLatch: CountDownLatch = CountDownLatch(if (pattern != null) 1 else 0)
     val buffer: LinkedList<Int> = LinkedList()
-    val thread: Thread = Thread({
+    val thread: Thread = Thread {
 
-        var byte:Int = inputStream.read()
-        while(byte != -1) {
+        var byte: Int = inputStream.read()
+        while (byte != -1) {
             outputStream.write(byte)
             outputStream.flush()
 
             if (patternLength == 0 || patternLatch.count == 0L) {
                 log.debug("skipping pattern checking")
-            } else if (buffer.size < patternLength-1) {
+            } else if (buffer.size < patternLength - 1) {
                 buffer.addLast(byte)
             } else {
                 buffer.addLast(byte)
@@ -50,7 +48,8 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
             byte = inputStream.read()
         }
         close()
-    })
+    }
+
     init {
         thread.start()
     }
@@ -68,8 +67,8 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
      * @param timeout the maximum number of TimeUnits to wait
      * @param unit the unit of time to wait
      */
-    fun waitForPattern(timeout:Long, unit: TimeUnit) {
-        if(!patternLatch.await(timeout, unit)) {
+    fun waitForPattern(timeout: Long, unit: TimeUnit) {
+        if (!patternLatch.await(timeout, unit)) {
             throw GradleException("The waitForOutput pattern did not appear before timeout was reached.")
         }
     }

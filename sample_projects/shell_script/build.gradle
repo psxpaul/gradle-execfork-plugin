@@ -18,7 +18,7 @@ task verify(dependsOn: 'startDaemon') {
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
-  commandLine = './com/github/psxpaul/example/Main.sh'
+  executable = './com/github/psxpaul/example/Main.sh'
   workingDir = "$projectDir/src/main/bash"
   standardOutput = "$buildDir/daemon.log"
   errorOutput = "$buildDir/daemon-error.log"

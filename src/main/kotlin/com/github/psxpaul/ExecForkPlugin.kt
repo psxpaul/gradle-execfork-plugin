@@ -27,7 +27,7 @@ class ExecForkPlugin : Plugin<Project> {
     override fun apply(project: Project?) {
         val forkTasks: ArrayList<AbstractExecFork> = ArrayList()
 
-        project?.tasks?.whenTaskAdded({ task: Task ->
+        project?.tasks?.whenTaskAdded { task: Task ->
             if (task is AbstractExecFork) {
                 val forkTask: AbstractExecFork = task
                 val joinTask: ExecJoin = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java)
@@ -36,14 +36,14 @@ class ExecForkPlugin : Plugin<Project> {
 
                 forkTasks.add(task)
             }
-        })
+        }
 
-        project?.gradle?.addBuildListener(object: BuildAdapter() {
+        project?.gradle?.addBuildListener(object : BuildAdapter() {
             override fun buildFinished(result: BuildResult?) {
                 for (forkTask: AbstractExecFork in forkTasks) {
                     try {
                         forkTask.stop()
-                    } catch (e:InterruptedException) {
+                    } catch (e: InterruptedException) {
                         log.error("Error stopping daemon for {} task '{}'", forkTask.javaClass.simpleName, forkTask.name, e);
                     }
                 }

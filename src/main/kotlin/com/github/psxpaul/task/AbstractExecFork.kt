@@ -6,7 +6,10 @@ import com.github.psxpaul.util.waitForPortOpen
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Task
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ProcessForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -20,8 +23,8 @@ import java.util.concurrent.TimeUnit
  *
  * @see ExecFork
  * @see JavaExecFork
+ * @see ProcessForkOptions
  *
- * @param workingDir the working directory that the process is run from
  * @param args the arguments to give the executable
  * @param standardOutput the name of the file to write the process's standard output to
  * @param errorOutput the name of the file to write the process's error output to
@@ -32,36 +35,53 @@ import java.util.concurrent.TimeUnit
  * @param stopAfter if specified, this task will stop the running process after the stopAfter
  *                 task has been completed
  */
-abstract class AbstractExecFork : DefaultTask() {
-    val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
+abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
+    private val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
-    var workingDir: CharSequence = project.projectDir.absolutePath
-    var args: MutableList<CharSequence> = mutableListOf()
+    @Input
+    var args: MutableList<String> = mutableListOf()
+
+    @Input
+    @Optional
     var standardOutput: String? = null
-    var errorOutput: String? = null
-    var environment: MutableMap<CharSequence, CharSequence> = mutableMapOf()
-        set(value) {
-            field.putAll(value)
-        }
 
+    @Input
+    @Optional
+    var errorOutput: String? = null
+
+    @Input
+    @Optional
     var waitForPort: Int? = null
+
+    @Input
+    @Optional
     var waitForOutput: String? = null
+
+    @Input
+    @Optional
     var waitForError: String? = null
-    var process: Process? = null
+
+    private var process: Process? = null
+
+    @Input
     var timeout: Long = 60
 
+    @Input
+    @Optional
     var stopAfter: Task? = null
-        set(value: Task?) {
+        set(value) {
             val joinTaskVal = joinTask
             if (joinTaskVal != null) {
-                log.info("Adding '{}' as a finalizing task to '{}'", joinTaskVal.getName(), value?.getName())
+                log.info("Adding '{}' as a finalizing task to '{}'", joinTaskVal.name, value?.name)
                 value?.finalizedBy(joinTask)
             }
             field = value
         }
 
+    @Input
+    @Optional
     var joinTask: ExecJoin? = null
-        set(value: ExecJoin?) {
+        set(value) {
             val stopAfterVal = stopAfter
             if (stopAfterVal != null) {
                 log.info("Adding {} as a finalizing task to {}", value?.name, stopAfterVal.name)
@@ -72,27 +92,28 @@ abstract class AbstractExecFork : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        joinTask ?: throw GradleException("${javaClass.simpleName} task $name did not have a joinTask associated. Make sure you have \"apply plugin: 'gradle-javaexecfork-plugin'\" somewhere in your gradle file")
+        joinTask
+                ?: throw GradleException("${javaClass.simpleName} task $name did not have a joinTask associated. Make sure you have \"apply plugin: 'gradle-javaexecfork-plugin'\" somewhere in your gradle file")
 
-        val processBuilder: ProcessBuilder = ProcessBuilder(getProcessArgs())
+        val processBuilder = ProcessBuilder(getProcessArgs())
         redirectStreams(processBuilder)
 
-        val processWorkingDir: File = File(workingDir.toString())
+        val processWorkingDir = workingDir
         processWorkingDir.mkdirs()
         processBuilder.directory(processWorkingDir)
 
-        environment.forEach { processBuilder.environment().put(it.key.toString(), it.value.toString()) }
+        environment.forEach { processBuilder.environment()[it.key.toString()] = it.value.toString() }
 
         log.info("running process: {}", processBuilder.command().joinToString(separator = " "))
 
         this.process = processBuilder.start()
         installPipesAndWait(this.process!!)
 
-        val waitForPortVal:Int? = waitForPort
+        val waitForPortVal: Int? = waitForPort
         if (waitForPortVal != null)
             waitForPortOpen(waitForPortVal, timeout, TimeUnit.SECONDS, process!!)
 
-        val task:AbstractExecFork = this
+        val task: AbstractExecFork = this
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 task.stop()
@@ -100,15 +121,16 @@ abstract class AbstractExecFork : DefaultTask() {
         })
     }
 
+    @Input
     abstract fun getProcessArgs(): List<String>?
 
-    private fun installPipesAndWait(process:Process) {
-        val processOut = if(!standardOutput.isNullOrBlank()) {
+    private fun installPipesAndWait(process: Process) {
+        val processOut = if (!standardOutput.isNullOrBlank()) {
             File(standardOutput).parentFile.mkdirs()
             FileOutputStream(standardOutput)
         } else OutputStreamLogger(project.logger)
         val outPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
-        if(errorOutput != null) {
+        if (errorOutput != null) {
             File(errorOutput).parentFile.mkdirs()
 
             val errPipe = InputStreamPipe(process.errorStream, FileOutputStream(errorOutput), waitForError)
@@ -117,16 +139,9 @@ abstract class AbstractExecFork : DefaultTask() {
         outPipe.waitForPattern(timeout, TimeUnit.SECONDS)
     }
 
-    private fun redirectStreams(processBuilder:ProcessBuilder) {
-        if(errorOutput == null)
+    private fun redirectStreams(processBuilder: ProcessBuilder) {
+        if (errorOutput == null)
             processBuilder.redirectErrorStream(true)
-    }
-
-    /**
-     * Adds an environment variable to the process
-     */
-    fun environment(name:String, value:String) {
-        environment.put(name, value)
     }
 
     /**

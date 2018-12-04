@@ -7,7 +7,7 @@ package com.github.psxpaul.util
  * @param t the Throwable to find nested causes in
  * @return the most-nestedest Throwable
  */
-fun rootCauseOf(t:Throwable):Throwable  {
+fun rootCauseOf(t: Throwable): Throwable {
     val cause: Throwable = t.cause ?: return t
     return rootCauseOf(cause)
 }

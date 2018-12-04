@@ -1,7 +1,13 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.file.FileResolver
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.gradle.internal.jvm.Jvm
+import org.gradle.process.JavaForkOptions
+import org.gradle.process.internal.DefaultJavaForkOptions
+import javax.inject.Inject
 
 /**
  * A task that will run a java class in a separate process, optionally
@@ -12,22 +18,24 @@ import org.gradle.internal.jvm.Jvm
  *
  * @param classpath the classpath to call java with
  * @param main the fully qualified name of the class to execute (e.g. 'com.foo.bar.MainExecutable')
- * @param jvmArgs a list of arguments to provide the jvm (not to be confused with the args to give
- *              to the main class). E.g. ['-Xmx100m', '-Xmx500m', '-Dspring.profiles.active=dev', "-Djava.io.tmpdir=$buildDir/tmp"]
  */
-open class JavaExecFork : AbstractExecFork() {
+open class JavaExecFork @Inject constructor(fileResolver: FileResolver) : AbstractExecFork(),
+        JavaForkOptions by DefaultJavaForkOptions(fileResolver) {
+
+    @InputFiles
     var classpath: FileCollection? = null
-    var main:CharSequence? = null
-    var jvmArgs:List<CharSequence> = listOf()
+
+    @Input
+    var main: String? = null
 
     override fun getProcessArgs(): List<String>? {
-        val processArgs:MutableList<String> = mutableListOf()
-        processArgs.add(Jvm.current().javaExecutable.absoluteFile.absolutePath)
+        val processArgs = mutableListOf<String>()
+        processArgs.add(Jvm.current().javaExecutable.absolutePath)
         processArgs.add("-cp")
-        processArgs.add(classpath!!.asPath)
-        processArgs.addAll(jvmArgs.map(CharSequence::toString))
-        processArgs.add(main!!.toString())
-        processArgs.addAll(args.map(CharSequence::toString))
+        processArgs.add((bootstrapClasspath + classpath!!).asPath)
+        processArgs.addAll(allJvmArgs)
+        processArgs.add(main!!)
+        processArgs.addAll(args)
         return processArgs
     }
 }
