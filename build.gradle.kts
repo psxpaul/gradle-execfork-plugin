@@ -24,7 +24,7 @@ pluginBundle {
   tags = listOf("java", "exec", "background", "process")
 
   (plugins) {
-    "greetingsPlugin" {
+    create("execForkPlugin") {
       id = "com.github.psxpaul.execfork"
       displayName = "Gradle Exec Fork Plugin"
     }
@@ -60,7 +60,7 @@ val javadocJar by tasks.creating(Jar::class) {
 
 val sourcesJar by tasks.creating(Jar::class) {
   classifier = "sources"
-  from(java.sourceSets["main"].allSource)
+  from(sourceSets["main"].allSource)
 }
 
 artifacts {
