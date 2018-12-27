@@ -6,14 +6,13 @@ import com.github.psxpaul.util.waitForPortOpen
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Task
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.process.ProcessForkOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.concurrent.TimeUnit
 
 /**
@@ -41,11 +40,11 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     var args: MutableList<String> = mutableListOf()
 
-    @Input
+    @OutputFile
     @Optional
     var standardOutput: String? = null
 
-    @Input
+    @OutputFile
     @Optional
     var errorOutput: String? = null
 
@@ -66,8 +65,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     var timeout: Long = 60
 
-    @Input
-    @Optional
+    @Internal
     var stopAfter: Task? = null
         set(value: Task?) {
             val joinTaskVal = joinTask
@@ -78,8 +76,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
             field = value
         }
 
-    @Input
-    @Optional
+    @Internal
     var joinTask: ExecJoin? = null
         set(value: ExecJoin?) {
             val stopAfterVal = stopAfter
