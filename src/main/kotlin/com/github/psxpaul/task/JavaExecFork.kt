@@ -29,7 +29,7 @@ open class JavaExecFork @Inject constructor(fileResolver: FileResolver) : Abstra
     var main: String? = null
 
     override fun getProcessArgs(): List<String>? {
-        val processArgs = mutableListOf<String>()
+        val processArgs: MutableList<String> = mutableListOf()
         processArgs.add(Jvm.current().javaExecutable.absolutePath)
         processArgs.add("-cp")
         processArgs.add((bootstrapClasspath + classpath!!).asPath)

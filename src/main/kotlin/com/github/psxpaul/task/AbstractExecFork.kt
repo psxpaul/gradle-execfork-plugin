@@ -69,7 +69,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     @Optional
     var stopAfter: Task? = null
-        set(value) {
+        set(value: Task?) {
             val joinTaskVal = joinTask
             if (joinTaskVal != null) {
                 log.info("Adding '{}' as a finalizing task to '{}'", joinTaskVal.name, value?.name)
@@ -81,7 +81,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     @Optional
     var joinTask: ExecJoin? = null
-        set(value) {
+        set(value: ExecJoin?) {
             val stopAfterVal = stopAfter
             if (stopAfterVal != null) {
                 log.info("Adding {} as a finalizing task to {}", value?.name, stopAfterVal.name)
@@ -95,10 +95,10 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
         joinTask
                 ?: throw GradleException("${javaClass.simpleName} task $name did not have a joinTask associated. Make sure you have \"apply plugin: 'gradle-javaexecfork-plugin'\" somewhere in your gradle file")
 
-        val processBuilder = ProcessBuilder(getProcessArgs())
+        val processBuilder: ProcessBuilder = ProcessBuilder(getProcessArgs())
         redirectStreams(processBuilder)
 
-        val processWorkingDir = workingDir
+        val processWorkingDir: File = workingDir
         processWorkingDir.mkdirs()
         processBuilder.directory(processWorkingDir)
 
@@ -125,7 +125,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     abstract fun getProcessArgs(): List<String>?
 
     private fun installPipesAndWait(process: Process) {
-        val processOut = if (!standardOutput.isNullOrBlank()) {
+        val processOut: OutputStream = if (!standardOutput.isNullOrBlank()) {
             File(standardOutput).parentFile.mkdirs()
             FileOutputStream(standardOutput)
         } else OutputStreamLogger(project.logger)

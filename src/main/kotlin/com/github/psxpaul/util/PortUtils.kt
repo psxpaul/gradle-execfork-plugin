@@ -20,12 +20,12 @@ fun findOpenPort(): Int {
 private fun isPortOpen(port: Int): Boolean {
     Socket().use {
         val inetAddress: InetAddress = InetAddress.getByName("127.0.0.1")
-        val socketAddress = InetSocketAddress(inetAddress, port)
-        try {
+        val socketAddress: InetSocketAddress = InetSocketAddress(inetAddress, port)
+        return try {
             it.connect(socketAddress)
-            return true;
+            true
         } catch (e: ConnectException) {
-            return false
+            false
         }
     }
 }

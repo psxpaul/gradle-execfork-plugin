@@ -17,7 +17,7 @@ open class ExecFork @Inject constructor(fileResolver: FileResolver) : AbstractEx
         ProcessForkOptions by DefaultJavaForkOptions(fileResolver) {
 
     override fun getProcessArgs(): List<String>? {
-        val processArgs = mutableListOf<String>()
+        val processArgs: MutableList<String> = mutableListOf()
         processArgs.add(executable!!)
         processArgs.addAll(args)
         return processArgs
