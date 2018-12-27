@@ -87,6 +87,13 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
             field = value
         }
 
+    init {
+        // The exec fork task should be executed in any case if not manually specified otherwise.
+        // By default this is the case as the task has only inputs defined, but e.g. jacoco attaches a jvm argument
+        // provider, which in turn contributes an output property, which causes the task to be considered up-to-date.
+        outputs.upToDateWhen { false }
+    }
+
     @TaskAction
     fun exec() {
         joinTask
