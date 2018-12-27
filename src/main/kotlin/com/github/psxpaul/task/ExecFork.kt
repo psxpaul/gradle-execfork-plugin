@@ -1,6 +1,7 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.internal.file.FileResolver
+import org.gradle.internal.file.PathToFileResolver
 import org.gradle.process.ProcessForkOptions
 import org.gradle.process.internal.DefaultJavaForkOptions
 import javax.inject.Inject
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * @see AbstractExecFork
  * @see ProcessForkOptions for all available configuration options
  */
-open class ExecFork @Inject constructor(fileResolver: FileResolver) : AbstractExecFork(),
+open class ExecFork @Inject constructor(fileResolver: PathToFileResolver) : AbstractExecFork(),
         ProcessForkOptions by DefaultJavaForkOptions(fileResolver) {
 
     /**

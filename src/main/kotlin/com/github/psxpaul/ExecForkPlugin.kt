@@ -5,9 +5,11 @@ import com.github.psxpaul.task.ExecJoin
 import com.github.psxpaul.task.createNameFor
 import org.gradle.BuildAdapter
 import org.gradle.BuildResult
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.util.GradleVersion
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -25,6 +27,10 @@ class ExecForkPlugin : Plugin<Project> {
     val log: Logger = LoggerFactory.getLogger(ExecForkPlugin::class.java)
 
     override fun apply(project: Project?) {
+        if (GradleVersion.current() < GradleVersion.version("4.10")) {
+            throw GradleException("This version of the plugin is incompatible with gradle < 4.10! Use execfork version 0.1.8 for now.")
+        }
+
         val forkTasks: ArrayList<AbstractExecFork> = ArrayList()
 
         project?.tasks?.whenTaskAdded { task: Task ->
