@@ -16,6 +16,16 @@ import javax.inject.Inject
 open class ExecFork @Inject constructor(fileResolver: FileResolver) : AbstractExecFork(),
         ProcessForkOptions by DefaultJavaForkOptions(fileResolver) {
 
+    /**
+     * The path to the executable to run
+     * @deprecated Use #executable instead
+     */
+    var commandLine: String?
+        get() = executable
+        set(value) {
+            executable = value
+        }
+
     override fun getProcessArgs(): List<String>? {
         val processArgs: MutableList<String> = mutableListOf()
         processArgs.add(executable!!)
