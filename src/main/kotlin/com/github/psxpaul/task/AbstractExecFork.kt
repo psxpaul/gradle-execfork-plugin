@@ -130,12 +130,12 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
 
     private fun installPipesAndWait(process: Process) {
         val processOut: OutputStream = if (!standardOutput.isNullOrBlank()) {
-            File(standardOutput).parentFile.mkdirs()
+            project.file(standardOutput!!).parentFile.mkdirs()
             FileOutputStream(standardOutput)
         } else OutputStreamLogger(project.logger)
         val outPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
         if (errorOutput != null) {
-            File(errorOutput).parentFile.mkdirs()
+            project.file(errorOutput!!).parentFile.mkdirs()
 
             val errPipe = InputStreamPipe(process.errorStream, FileOutputStream(errorOutput), waitForError)
             errPipe.waitForPattern(timeout, TimeUnit.SECONDS)
@@ -144,8 +144,9 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     }
 
     private fun redirectStreams(processBuilder: ProcessBuilder) {
-        if (errorOutput == null)
+        if (errorOutput == null) {
             processBuilder.redirectErrorStream(true)
+        }
     }
 
     /**
@@ -154,5 +155,9 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     fun stop() {
         if (process != null && process!!.isAlive)
             process!!.destroyForcibly().waitFor(15, TimeUnit.SECONDS)
+
+    @Internal
+    fun <T : Task> setStopAfter(taskProvider: TaskProvider<T>) {
+        stopAfter = taskProvider.get()
     }
 }

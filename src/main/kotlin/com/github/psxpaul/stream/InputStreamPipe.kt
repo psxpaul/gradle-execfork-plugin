@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit
 class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStream, val pattern: String?) : AutoCloseable {
     val log: Logger = LoggerFactory.getLogger(InputStreamPipe::class.java)
 
-    val patternLength: Int = if (pattern != null) pattern.toByteArray().size else 0
+    val patternLength: Int = pattern?.toByteArray()?.size ?: 0
     val patternLatch: CountDownLatch = CountDownLatch(if (pattern != null) 1 else 0)
     val buffer: LinkedList<Int> = LinkedList()
-    val thread: Thread = Thread {
+    private val thread: Thread = Thread {
 
         var byte: Int = inputStream.read()
         while (byte != -1) {
