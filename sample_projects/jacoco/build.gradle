@@ -20,7 +20,6 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   standardOutput = "$buildDir/daemon.log"
   stopAfter = workerTask
   jacoco.applyTo(it)
-  jacoco.includeNoLocationClasses = true
 }
 
 task daemonCodeCoverageReport(type: JacocoReport) {
