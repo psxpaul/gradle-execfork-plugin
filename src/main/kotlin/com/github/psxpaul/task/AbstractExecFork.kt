@@ -60,6 +60,9 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Optional
     var waitForError: String? = null
 
+    @Input
+    var forceKill: Boolean = false
+
     private var process: Process? = null
 
     @Input
@@ -153,8 +156,15 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
      * Stop the process that this task has spawned
      */
     fun stop() {
-        if (process != null && process!!.isAlive)
-            process!!.destroyForcibly().waitFor(15, TimeUnit.SECONDS)
+        val process: Process = process ?: return
+        if (process.isAlive && !forceKill) {
+            process.destroy()
+            process.waitFor(15, TimeUnit.SECONDS)
+        }
+        if (process.isAlive) {
+            process.destroyForcibly().waitFor(15, TimeUnit.SECONDS)
+        }
+    }
 
     @Internal
     fun <T : Task> setStopAfter(taskProvider: TaskProvider<T>) {
