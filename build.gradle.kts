@@ -54,12 +54,12 @@ tasks {
 
 
 val javadocJar by tasks.creating(Jar::class) {
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from("javadoc")
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
 }
 

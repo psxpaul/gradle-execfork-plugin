@@ -1,6 +1,11 @@
+buildscript {
+  dependencies {
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
+  }
+}
+
 plugins {
   id 'org.springframework.boot' version '1.5.3.RELEASE'
-  id 'com.github.psxpaul.execfork' version '0.1.8'
 }
 
 repositories {

@@ -7,11 +7,11 @@ For running a standard executable:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.8'
+  id 'com.github.psxpaul.execfork' version '0.1.9'
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
-    commandLine = './MainScript.sh'
+    executable = './MainScript.sh'
     args = [ '-d', '/foo/bar/data', '-v', '-l', '3' ]
     workingDir = "$projectDir/src/main/bash"
     standardOutput = "$buildDir/daemon.log"
@@ -27,7 +27,7 @@ For running a java main class:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.8'
+  id 'com.github.psxpaul.execfork' version '0.1.9'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
@@ -58,7 +58,7 @@ waitForPort | Int | *Optional.* A port number to watch for to be open. Until ope
 waitForOutput | String | *Optional.* A string to look for in standardOutput. The task will block until this pattern appeared or the timeout is reached. If not specified, the task will return immediately after launching the process.
 timeout | Long | *Optional.* The maximum number of seconds associated with the waitForPort or waitForOutput task. Default: `60`
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
-commandLine | String | *Required.* The path to the executable.
+executable | String | *Required.* The path to the executable.
 environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the executable with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
 
 

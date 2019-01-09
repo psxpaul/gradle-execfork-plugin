@@ -8,6 +8,7 @@ import org.gradle.BuildResult
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.util.GradleVersion
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,21 +28,22 @@ class ExecForkPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         if (GradleVersion.current() < GradleVersion.version("4.10")) {
-            throw GradleException("This version of the plugin is incompatible with gradle < 4.10! Use can use execfork version 0.1.8 for now.")
+            throw GradleException("This version of the plugin is incompatible with gradle < 4.10! Please use execfork version 0.1.8, or upgrade gradle.")
         }
 
         val forkTasks: ArrayList<AbstractExecFork> = ArrayList()
+        project.tasks.whenTaskAdded { task: Task ->
+            if (task is AbstractExecFork) {
+                val forkTask: AbstractExecFork = task
+                val joinTask: ExecJoin = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java)
+                joinTask.forkTask = forkTask
+                forkTask.joinTask = joinTask
 
-        project.tasks.withType(AbstractExecFork::class.java).configureEach {
-            val forkTask = this
-            forkTask.joinTask = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java) {
-                this.forkTask = forkTask
+                forkTasks.add(forkTask)
             }
-
-            forkTasks.add(forkTask)
         }
 
-        project.gradle.addBuildListener(object : BuildAdapter() {
+        project.gradle.addBuildListener(object: BuildAdapter() {
             override fun buildFinished(result: BuildResult) {
                 for (forkTask: AbstractExecFork in forkTasks) {
                     try {

@@ -11,6 +11,7 @@ buildscript {
 task workerTask(dependsOn: 'startDaemon') {
   doLast {
     sleep(1000)
+    assert file("$buildDir/daemon.log").text.contains("PING") == true
   }
 }
 
@@ -18,13 +19,14 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
   standardOutput = "$buildDir/daemon.log"
+  waitForOutput = 'PING'
   stopAfter = workerTask
   jacoco.applyTo(it)
 }
 
 task daemonCodeCoverageReport(type: JacocoReport) {
   executionData startDaemon.jacoco.destinationFile
-  classDirectories = sourceSets.main.runtimeClasspath
+  classDirectories.setFrom(sourceSets.main.runtimeClasspath)
   sourceSets sourceSets.main
   reports.xml.enabled = true
   reports.html.enabled = false

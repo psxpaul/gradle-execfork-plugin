@@ -71,7 +71,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Internal
     var stopAfter: Task? = null
         set(value: Task?) {
-            val joinTaskVal = joinTask
+            val joinTaskVal: ExecJoin? = joinTask
             if (joinTaskVal != null) {
                 log.info("Adding '{}' as a finalizing task to '{}'", joinTaskVal.name, value?.name)
                 value?.finalizedBy(joinTask)
@@ -82,7 +82,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Internal
     var joinTask: ExecJoin? = null
         set(value: ExecJoin?) {
-            val stopAfterVal = stopAfter
+            val stopAfterVal: Task? = stopAfter
             if (stopAfterVal != null) {
                 log.info("Adding {} as a finalizing task to {}", value?.name, stopAfterVal.name)
                 stopAfterVal.finalizedBy(value)
@@ -136,11 +136,11 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
             project.file(standardOutput!!).parentFile.mkdirs()
             FileOutputStream(standardOutput)
         } else OutputStreamLogger(project.logger)
-        val outPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
+        val outPipe: InputStreamPipe = InputStreamPipe(process.inputStream, processOut, waitForOutput)
         if (errorOutput != null) {
             project.file(errorOutput!!).parentFile.mkdirs()
 
-            val errPipe = InputStreamPipe(process.errorStream, FileOutputStream(errorOutput), waitForError)
+            val errPipe: InputStreamPipe = InputStreamPipe(process.errorStream, FileOutputStream(errorOutput), waitForError)
             errPipe.waitForPattern(timeout, TimeUnit.SECONDS)
         }
         outPipe.waitForPattern(timeout, TimeUnit.SECONDS)
