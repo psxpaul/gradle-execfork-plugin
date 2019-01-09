@@ -1,0 +1,43 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'gradle-execfork-plugin'
+
+buildscript {
+  dependencies {
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
+  }
+}
+
+task workerTask(dependsOn: 'startDaemon') {
+  doLast {
+    sleep(1000)
+  }
+}
+
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
+  standardOutput = "$buildDir/daemon.log"
+  stopAfter = workerTask
+  jacoco.applyTo(it)
+}
+
+task daemonCodeCoverageReport(type: JacocoReport) {
+  executionData startDaemon.jacoco.destinationFile
+  classDirectories = sourceSets.main.runtimeClasspath
+  sourceSets sourceSets.main
+  reports.xml.enabled = true
+  reports.html.enabled = false
+}
+daemonCodeCoverageReport.mustRunAfter stopDaemon
+workerTask.finalizedBy daemonCodeCoverageReport
+
+
+task verify(dependsOn: 'daemonCodeCoverageReport') {
+  doLast {
+    assert file("$buildDir/reports/jacoco/daemonCodeCoverageReport/daemonCodeCoverageReport.xml").text.contains('<line nr="5" mi="0" ci="3" mb="0" cb="0"/>')
+  }
+}
+
+build.dependsOn workerTask
+build.dependsOn verify

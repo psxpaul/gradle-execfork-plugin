@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory
  *
  * @param forkTask the task to call stop() on
  */
-open class ExecJoin() : DefaultTask() {
-    val log: Logger = LoggerFactory.getLogger(ExecJoin::class.java)
+open class ExecJoin : DefaultTask() {
+    private val log: Logger = LoggerFactory.getLogger(ExecJoin::class.java)
 
     var forkTask: AbstractExecFork? = null
 
