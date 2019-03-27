@@ -1,7 +1,7 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.file.FileResolver
+import org.gradle.api.internal.file.DefaultFileCollectionFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.internal.file.PathToFileResolver
@@ -21,7 +21,7 @@ import javax.inject.Inject
  * @param main the fully qualified name of the class to execute (e.g. 'com.foo.bar.MainExecutable')
  */
 open class JavaExecFork @Inject constructor(fileResolver: PathToFileResolver) : AbstractExecFork(),
-        JavaForkOptions by DefaultJavaForkOptions(fileResolver) {
+        JavaForkOptions by DefaultJavaForkOptions(fileResolver, DefaultFileCollectionFactory(fileResolver, null)) {
 
     @InputFiles
     var classpath: FileCollection? = null
