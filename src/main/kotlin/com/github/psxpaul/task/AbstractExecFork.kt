@@ -38,7 +38,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     private val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     @Input
-    var args: MutableList<String> = mutableListOf()
+    var args: MutableList<CharSequence> = mutableListOf()
 
     @OutputFile
     @Optional

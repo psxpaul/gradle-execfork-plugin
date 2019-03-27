@@ -36,7 +36,7 @@ open class JavaExecFork @Inject constructor(fileResolver: PathToFileResolver) : 
         processArgs.add((bootstrapClasspath + classpath!!).asPath)
         processArgs.addAll(allJvmArgs)
         processArgs.add(main!!)
-        processArgs.addAll(args)
+        processArgs.addAll(args.map(CharSequence::toString))
         return processArgs
     }
 }
