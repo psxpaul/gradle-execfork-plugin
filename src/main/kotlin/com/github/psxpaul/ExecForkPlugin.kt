@@ -27,8 +27,8 @@ class ExecForkPlugin : Plugin<Project> {
     val log: Logger = LoggerFactory.getLogger(ExecForkPlugin::class.java)
 
     override fun apply(project: Project) {
-        if (GradleVersion.current() < GradleVersion.version("4.10")) {
-            throw GradleException("This version of the plugin is incompatible with gradle < 4.10! Please use execfork version 0.1.8, or upgrade gradle.")
+        if (GradleVersion.current() < GradleVersion.version("5.3")) {
+            throw GradleException("This version of the plugin is incompatible with gradle < 5.3! Please use execfork version 0.1.9, or upgrade gradle.")
         }
 
         val forkTasks: ArrayList<AbstractExecFork> = ArrayList()
