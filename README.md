@@ -79,3 +79,10 @@ main | String | *Required.* The qualified name of the main java class to execute
 jvmArgs | List<String> | *Optional.* The list of arguments to give to the jvm when launching the java main class.
 environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the java main class with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
 
+## Compatibility
+
+Gradle Version | ExecFork version
+--- | ---
+< 4.10 | 0.1.8
+4.10 - 5.2.x | 0.1.9
+since 5.3.0 | 0.1.10

@@ -3,6 +3,7 @@ package com.github.psxpaul.stream
 import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
@@ -17,15 +18,15 @@ import java.util.concurrent.TimeUnit
  * @param outputStream the outputStream to copy to
  * @param pattern the optional pattern to wait for when calling waitForPattern()
  */
-class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStream, val pattern: String?) : AutoCloseable {
-    val log: Logger = LoggerFactory.getLogger(InputStreamPipe::class.java)
+class InputStreamPipe(private val inputStream: InputStream, private val outputStream: OutputStream, private val pattern: String?) : AutoCloseable {
+    private val log: Logger = LoggerFactory.getLogger(InputStreamPipe::class.java)
 
-    val patternLength: Int = pattern?.toByteArray()?.size ?: 0
-    val patternLatch: CountDownLatch = CountDownLatch(if (pattern != null) 1 else 0)
-    val buffer: LinkedList<Int> = LinkedList()
+    private val patternLength: Int = pattern?.toByteArray()?.size ?: 0
+    private val patternLatch: CountDownLatch = CountDownLatch(if (pattern != null) 1 else 0)
+    private val buffer: LinkedList<Int> = LinkedList()
     private val thread: Thread = Thread {
 
-        var byte: Int = inputStream.read()
+        var byte: Int = inputStream.safeRead()
         while (byte != -1) {
             outputStream.write(byte)
             outputStream.flush()
@@ -45,7 +46,7 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
                 buffer.removeFirst()
             }
 
-            byte = inputStream.read()
+            byte = inputStream.safeRead()
         }
         close()
     }
@@ -79,5 +80,17 @@ class InputStreamPipe(val inputStream: InputStream, val outputStream: OutputStre
     override fun close() {
         log.debug("closing given outputstream")
         outputStream.close()
+    }
+}
+
+fun InputStream.safeRead(): Int {
+    return try {
+        read()
+    } catch (e: IOException) {
+        if (e.message == "Stream closed") {
+            -1
+        } else {
+            throw e
+        }
     }
 }

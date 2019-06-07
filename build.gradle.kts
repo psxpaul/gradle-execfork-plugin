@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("com.gradle.plugin-publish").version("0.9.7")
     id("org.jetbrains.kotlin.jvm").version("1.2.40")
@@ -50,6 +52,9 @@ tasks {
     }
     buildSampleProjects.dependsOn("install")
     "build" { finalizedBy(buildSampleProjects) }
+    named<Test>("test") {
+        testLogging.exceptionFormat = TestExceptionFormat.FULL
+    }
 }
 
 
@@ -67,4 +72,3 @@ artifacts {
     add("archives", javadocJar)
     add("archives", sourcesJar)
 }
-
