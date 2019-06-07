@@ -7,7 +7,7 @@ For running a standard executable:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.10'
+  id 'com.github.psxpaul.execfork' version '0.1.11'
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
@@ -27,7 +27,7 @@ For running a java main class:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.10'
+  id 'com.github.psxpaul.execfork' version '0.1.11'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
@@ -85,4 +85,4 @@ Gradle Version | ExecFork version
 --- | ---
 < 4.10 | 0.1.8
 4.10 - 5.2.x | 0.1.9
-since 5.3.0 | 0.1.10
+5.3.0+ | 0.1.11+
