@@ -17,6 +17,15 @@ task verify(dependsOn: 'startDaemon') {
   }
 }
 
+task postVerify(dependsOn: 'stopDaemon') {
+  doLast {
+    assert file("$buildDir/daemon.log").text.contains("PANG") == true
+    def previousMatches = file("$buildDir/daemon.log").text.findAll("PANG").size()
+    sleep(250)
+    assert previousMatches == file("$buildDir/daemon.log").text.findAll("PANG").size()
+  }
+}
+
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
   executable = './com/github/psxpaul/example/Main.sh'
   workingDir = "$projectDir/src/main/bash"
@@ -25,4 +34,4 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
   stopAfter = verify
 }
 
-build.dependsOn verify
+build.dependsOn verify, postVerify

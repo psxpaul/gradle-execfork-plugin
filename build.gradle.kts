@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("com.gradle.plugin-publish").version("0.9.7")
-    id("org.jetbrains.kotlin.jvm").version("1.2.40")
+    id("org.jetbrains.kotlin.jvm").version("1.3.41")
     id("idea")
     id("maven")
 }
