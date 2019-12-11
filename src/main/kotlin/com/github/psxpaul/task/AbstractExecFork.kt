@@ -63,7 +63,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     var forceKill: Boolean = false
 
-    private var process: Process? = null
+    public var process: Process? = null
 
     @Input
     var timeout: Long = 60

@@ -14,6 +14,12 @@ task verify(dependsOn: 'startDaemon') {
     assert file("$buildDir/daemon.log").text.contains("PONG") == false
     assert file("$buildDir/daemon-error.log").text.contains("PING") == false
     assert file("$buildDir/daemon-error.log").text.contains("PONG") == true
+
+    // make sure all children are killed
+    if(org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+      println("Explicitly destroying children on windows...")
+      startDaemon.process.toHandle().descendants().each { it.destroy() }
+    }
   }
 }
 
