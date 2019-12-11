@@ -158,10 +158,12 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     fun stop() {
         val process: Process = process ?: return
         if (process.isAlive && !forceKill) {
+            process.toHandle().descendants().forEach { it.destroy() }
             process.destroy()
             process.waitFor(15, TimeUnit.SECONDS)
         }
         if (process.isAlive) {
+            process.toHandle().descendants().forEach { it.destroyForcibly() }
             process.destroyForcibly().waitFor(15, TimeUnit.SECONDS)
         }
     }
