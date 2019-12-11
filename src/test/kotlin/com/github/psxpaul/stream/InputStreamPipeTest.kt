@@ -39,14 +39,14 @@ class InputStreamPipeTest {
         logger.waitForPattern()
 
         val outputFileContents:List<String> = splitAndRemoveExtraEmptyString()
-        val msg = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
+        val msg = "outputFileContents: ${outputFileContents.joinToString(separator = System.lineSeparator())}"
 
         assertThat(msg, outputFileContents, `is`(allLinesUntilPattern(lines)))
 
         latch.await()
 
         val outputFileContentsTwo:List<String> = splitAndRemoveExtraEmptyString()
-        val msgTwo = "outputFileContents: ${outputFileContents.joinToString(separator = "\\n")}"
+        val msgTwo = "outputFileContents: ${outputFileContents.joinToString(separator = System.lineSeparator())}"
         assertThat(msgTwo, outputFileContentsTwo, contains(*lines))
     }
 
@@ -56,7 +56,7 @@ class InputStreamPipeTest {
         return takeWhile.toList()
     }
 
-    private fun splitAndRemoveExtraEmptyString() = String(pipeOutput.toByteArray()).split("\n").filter { i -> i != "" }
+    private fun splitAndRemoveExtraEmptyString() = String(pipeOutput.toByteArray()).split(System.lineSeparator()).filter { i -> i != "" }
 
     @After
     fun cleanup() {
