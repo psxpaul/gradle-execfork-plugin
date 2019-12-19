@@ -67,7 +67,11 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     var forceKill: Boolean = false
 
-    private var process: Process? = null
+    @Input
+    @Optional
+    var killDescendants: Boolean = true
+
+    var process: Process? = null
 
     @Input
     var timeout: Long = 60
@@ -160,12 +164,19 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
      * Stop the process that this task has spawned
      */
     fun stop() {
-        val process: Process = process ?: return
         try {
-            stopDescendants()
+            if (killDescendants) {
+                stopDescendants()
+            }
         } catch(e: Exception) {
             log.warn("Failed to stop descendants", e)
         }
+
+        stopRootProcess()
+    }
+
+    private fun stopRootProcess() {
+        val process: Process = process ?: return
         if (process.isAlive && !forceKill) {
             process.destroy()
             process.waitFor(15, TimeUnit.SECONDS)
@@ -175,25 +186,27 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
         }
     }
 
-    fun stopDescendants() {
+    private fun stopDescendants() {
         val process: Process = process ?: return
         if(!process.isAlive) {
             return
         }
 
         val toHandle = process::class.memberFunctions.singleOrNull { it.name == "toHandle" }
-        if(toHandle == null) {
+        if (toHandle == null) {
+            log.error("Could not load Process.toHandle(). The killDescendants flag requires Java 9+. Please set killDescendants=false, or upgrade to Java 9+.")
             return // not supported, pre java 9?
         }
 
         toHandle.isAccessible = true
         val handle = toHandle.call(process)
-        if(handle == null) {
+        if (handle == null) {
+            log.warn("Could not get process handle. Process descendants may not be stopped.")
             return
         }
-        val descendants = handle::class.memberFunctions.single { it.name == "descendants" } as KFunction<Stream<*>>
+        val descendants = handle::class.memberFunctions.single { it.name == "descendants" }
         descendants.isAccessible = true
-        val children = descendants.call(handle);
+        val children: Stream<*> = descendants.call(handle) as Stream<*>;
         val destroy = handle::class.memberFunctions.single { it.name == if(forceKill) "destroyForcibly" else "destroy" }
         destroy.isAccessible = true
 

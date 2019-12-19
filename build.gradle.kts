@@ -40,24 +40,16 @@ repositories {
 }
 
 tasks {
-    val cleanSampleProjects by creating(GradleBuild::class) {
+    val sampleProjects by creating(GradleBuild::class) {
         buildFile = File("${project.rootDir}/sample_projects/build.gradle")
-        tasks = listOf("clean")
+        tasks = listOf("clean", "build")
     }
-    cleanSampleProjects.dependsOn("install")
-    "clean" { finalizedBy(cleanSampleProjects) }
-
-    val buildSampleProjects by creating(GradleBuild::class) {
-        buildFile = File("${project.rootDir}/sample_projects/build.gradle")
-        tasks = listOf("build")
-    }
-    buildSampleProjects.dependsOn("install")
-    "build" { finalizedBy(buildSampleProjects) }
+    sampleProjects.dependsOn("install")
+    "test" { finalizedBy(sampleProjects) }
     named<Test>("test") {
         testLogging.exceptionFormat = TestExceptionFormat.FULL
     }
 }
-
 
 val javadocJar by tasks.creating(Jar::class) {
     archiveClassifier.set("javadoc")

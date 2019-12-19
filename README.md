@@ -7,7 +7,7 @@ For running a standard executable:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.12'
+  id 'com.github.psxpaul.execfork' version '0.1.13'
 }
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
@@ -27,7 +27,7 @@ For running a java main class:
 
 ```groovy
 plugins {
-  id 'com.github.psxpaul.execfork' version '0.1.12'
+  id 'com.github.psxpaul.execfork' version '0.1.13'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork) {
@@ -60,6 +60,8 @@ timeout | Long | *Optional.* The maximum number of seconds associated with the w
 stopAfter | org.gradle.api.Task | *Optional.* A task that, when finished, will cause the process to stop. If none is specified, the process will stop at the very end of a build (whether successful or not).
 executable | String | *Required.* The path to the executable.
 environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the executable with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
+forceKill | Boolean | *Optional.* Kills the process foricbly. Forcible process destruction is defined as the immediate termination of a process, whereas normal termination allows the process to shut down cleanly.
+killDescendants | Boolean | *Optional.* Kill all descendents of the started process. Default: `true`
 
 
 #### JavaExecFork:
@@ -78,6 +80,8 @@ classpath | org.gradle.api.file.FileCollection | *Required.* The classpath to us
 main | String | *Required.* The qualified name of the main java class to execute.
 jvmArgs | List<String> | *Optional.* The list of arguments to give to the jvm when launching the java main class.
 environment | Two Strings OR one Map<String, String> | *Optional.* Environment variables to launch the java main class with. You can either assign a Map with the '=' operator, or pass 2 Strings as key/value to the function. Note that multiple calls to this function are supported.
+forceKill | Boolean | *Optional.* Kills the process foricbly. Forcible process destruction is defined as the immediate termination of a process, whereas normal termination allows the process to shut down cleanly.
+killDescendants | Boolean | *Optional.* Kill all descendents of the started process. Default: `true`
 
 ## Compatibility
 
