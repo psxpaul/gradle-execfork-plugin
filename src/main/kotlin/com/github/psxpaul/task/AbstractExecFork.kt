@@ -14,6 +14,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.*
+import kotlin.reflect.full.*
+import kotlin.reflect.jvm.*
+import java.util.stream.Stream
 
 /**
  * An abstract task that will launch an executable as a background process, optionally
@@ -157,12 +161,44 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
      */
     fun stop() {
         val process: Process = process ?: return
+        try {
+            stopDescendants()
+        } catch(e: Exception) {
+            log.warn("Failed to stop descendants", e)
+        }
         if (process.isAlive && !forceKill) {
             process.destroy()
             process.waitFor(15, TimeUnit.SECONDS)
         }
         if (process.isAlive) {
             process.destroyForcibly().waitFor(15, TimeUnit.SECONDS)
+        }
+    }
+
+    fun stopDescendants() {
+        val process: Process = process ?: return
+        if(!process.isAlive) {
+            return
+        }
+
+        val toHandle = process::class.memberFunctions.singleOrNull { it.name == "toHandle" }
+        if(toHandle == null) {
+            return // not supported, pre java 9?
+        }
+
+        toHandle.isAccessible = true
+        val handle = toHandle.call(process)
+        if(handle == null) {
+            return
+        }
+        val descendants = handle::class.memberFunctions.single { it.name == "descendants" } as KFunction<Stream<*>>
+        descendants.isAccessible = true
+        val children = descendants.call(handle);
+        val destroy = handle::class.memberFunctions.single { it.name == if(forceKill) "destroyForcibly" else "destroy" }
+        destroy.isAccessible = true
+
+        children.forEach {
+            destroy.call(it);
         }
     }
 

@@ -37,7 +37,7 @@ workerTask.finalizedBy daemonCodeCoverageReport
 
 task verify(dependsOn: 'daemonCodeCoverageReport') {
   doLast {
-    assert file("$buildDir/reports/jacoco/daemonCodeCoverageReport/daemonCodeCoverageReport.xml").text.contains('<line nr="5" mi="0" ci="3" mb="0" cb="0"/>')
+    assert file("$buildDir/reports/jacoco/daemonCodeCoverageReport/daemonCodeCoverageReport.xml").text.contains('<line nr="5"')
   }
 }
 
