@@ -18,6 +18,7 @@ dependencies {
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
+    testImplementation("io.mockk:mockk:1.10.0")
 }
 
 pluginBundle {
