@@ -12,12 +12,12 @@ version = File("VERSION").readText().trim()
 buildDir = File("build/gradle")
 
 dependencies {
-    compile(gradleApi())
-    compile("org.jetbrains.kotlin:kotlin-stdlib:1.3.41")
-    compile("org.jetbrains.kotlin:kotlin-reflect:1.3.41")
+    implementation(gradleApi())
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.41")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.41")
 
-    testCompile("junit:junit:4.12")
-    testCompile("org.hamcrest:hamcrest-all:1.3")
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.hamcrest:hamcrest-all:1.3")
 }
 
 pluginBundle {
