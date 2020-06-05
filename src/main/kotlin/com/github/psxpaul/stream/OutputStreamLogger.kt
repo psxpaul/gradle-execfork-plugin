@@ -9,12 +9,16 @@ import java.io.OutputStream
 class OutputStreamLogger(private val logger: Logger) : OutputStream() {
 
     var sb = StringBuilder()
+    private var wasCR = false
 
     override fun write(b: Int) {
         val character = b.toChar()
-        if (character == '\n') {
+        if (wasCR || character == '\n') {
             logger.lifecycle(sb.toString())
+            wasCR = false
             sb = StringBuilder()
+        } else if (character == '\r') {
+            wasCR = true
         } else
             sb.append(character)
     }
