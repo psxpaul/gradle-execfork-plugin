@@ -1,6 +1,7 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory
 open class ExecJoin : DefaultTask() {
     private val log: Logger = LoggerFactory.getLogger(ExecJoin::class.java)
 
+    @Internal
     var forkTask: AbstractExecFork? = null
 
     @TaskAction
