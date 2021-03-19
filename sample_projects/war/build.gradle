@@ -3,6 +3,9 @@ apply plugin: 'war'
 apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
+  repositories {
+    mavenLocal()
+  }
   dependencies {
     classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
   }
@@ -14,9 +17,9 @@ configurations {
 
 dependencies {
   jetty 'org.eclipse.jetty:jetty-runner:9.3.14.v20161028'
-  testCompile 'junit:junit:4.12'
-  testCompile 'org.hamcrest:hamcrest-library:1.3'
-  testCompile 'org.apache.httpcomponents:fluent-hc:4.5.2'
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.hamcrest:hamcrest-library:1.3'
+  testImplementation 'org.apache.httpcomponents:fluent-hc:4.5.2'
 }
 
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: war) {

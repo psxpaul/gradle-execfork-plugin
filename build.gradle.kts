@@ -1,10 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    id("com.gradle.plugin-publish").version("0.9.7")
-    id("org.jetbrains.kotlin.jvm").version("1.3.41")
+    id("com.gradle.plugin-publish").version("0.13.0")
+    id("org.jetbrains.kotlin.jvm").version("1.4.31")
     id("idea")
-    id("maven")
+    id("maven-publish")
 }
 
 group = "com.github.psxpaul"
@@ -12,12 +12,12 @@ version = File("VERSION").readText().trim()
 buildDir = File("build/gradle")
 
 dependencies {
-    compile(gradleApi())
-    compile("org.jetbrains.kotlin:kotlin-stdlib:1.3.41")
-    compile("org.jetbrains.kotlin:kotlin-reflect:1.3.41")
+    implementation(gradleApi())
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.31")
 
-    testCompile("junit:junit:4.12")
-    testCompile("org.hamcrest:hamcrest-all:1.3")
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.hamcrest:hamcrest-all:1.3")
 }
 
 pluginBundle {
@@ -44,7 +44,7 @@ tasks {
         buildFile = File("${project.rootDir}/sample_projects/build.gradle")
         tasks = listOf("clean", "build")
     }
-    sampleProjects.dependsOn("install")
+    sampleProjects.dependsOn("publishToMavenLocal")
     "test" { finalizedBy(sampleProjects) }
     named<Test>("test") {
         testLogging.exceptionFormat = TestExceptionFormat.FULL

@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
+  repositories {
+    mavenLocal()
+  }
   dependencies {
     classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
   }

@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'gradle-execfork-plugin'
 
 buildscript {
+  repositories {
+    mavenLocal()
+  }
   dependencies {
     classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
   }
@@ -30,7 +33,7 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
   if(org.gradle.internal.os.OperatingSystem.current().isWindows()) {
     executable = "$projectDir\\src\\main\\bash\\com\\github\\psxpaul\\example-win\\Main.bat"
   } else {
-    executable = './com/github/psxpaul/example/Main.sh'
+    executable = "$projectDir/src/main/bash/com/github/psxpaul/example/Main.sh"
   }
   workingDir = "$projectDir/src/main/bash"
   standardOutput = "$buildDir/daemon.log"

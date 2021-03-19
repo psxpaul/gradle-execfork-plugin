@@ -1,7 +1,6 @@
 buildscript {
   repositories {
     mavenLocal()
-    mavenCentral()
   }
   dependencies {
     classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
