@@ -1,11 +1,11 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    id("com.gradle.plugin-publish").version("0.13.0")
-    id("org.jetbrains.kotlin.jvm").version("1.4.31")
+    id("com.gradle.plugin-publish").version("0.14.0")
+    id("org.jetbrains.kotlin.jvm").version("1.4.32")
     id("idea")
     id("maven-publish")
-    // id("java-gradle-plugin")
+     id("java-gradle-plugin")
 }
 
 group = "com.github.psxpaul"
@@ -14,8 +14,8 @@ buildDir = File("build/gradle")
 
 dependencies {
     implementation(gradleApi())
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.31")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.32")
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.hamcrest:hamcrest-all:1.3")

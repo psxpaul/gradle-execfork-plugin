@@ -4,6 +4,7 @@ apply plugin: 'gradle-execfork-plugin'
 buildscript {
   repositories {
     mavenLocal()
+    mavenCentral()
   }
   dependencies {
     classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
@@ -12,7 +13,7 @@ buildscript {
 
 task verify(dependsOn: 'startDaemon') {
   doLast {
-    sleep(250)
+    sleep(2000)
     assert file("$buildDir/daemon.log").text.contains("PING") == true
     assert file("$buildDir/daemon.log").text.contains("PONG") == false
     assert file("$buildDir/daemon-error.log").text.contains("PING") == false
