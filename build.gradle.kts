@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm").version("1.3.41")
     id("idea")
     id("maven")
+    id("java-gradle-plugin")
 }
 
 group = "com.github.psxpaul"
