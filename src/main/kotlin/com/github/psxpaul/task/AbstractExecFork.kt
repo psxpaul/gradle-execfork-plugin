@@ -42,7 +42,16 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     private val log: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     @Input
+    override abstract fun getEnvironment(): MutableMap<String, Any>
+
+    @InputFile
+    override abstract fun getExecutable(): String?
+
+    @Input
     var args: MutableList<CharSequence> = mutableListOf()
+
+    @Internal
+    override abstract fun getWorkingDir(): File
 
     @OutputFile
     @Optional
@@ -68,15 +77,15 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     var forceKill: Boolean = false
 
     @Input
-    @Optional
     var killDescendants: Boolean = true
 
+    @Internal
     var process: Process? = null
 
     @Input
     var timeout: Long = 60
 
-    @Internal
+    @get:Internal
     var stopAfter: Task? = null
         set(value: Task?) {
             val joinTaskVal: ExecJoin? = joinTask
@@ -87,7 +96,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
             field = value
         }
 
-    @Internal
+    @get:Internal
     var joinTask: ExecJoin? = null
         set(value: ExecJoin?) {
             val stopAfterVal: Task? = stopAfter
@@ -215,7 +224,6 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
         }
     }
 
-    @Internal
     fun <T : Task> setStopAfter(taskProvider: TaskProvider<T>) {
         stopAfter = taskProvider.get()
     }
