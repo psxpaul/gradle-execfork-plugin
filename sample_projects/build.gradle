@@ -15,11 +15,4 @@ subprojects {
     mavenLocal()
     mavenCentral()
   }
-
-  buildscript {
-    repositories {
-      mavenLocal()
-      mavenCentral()
-    }
-  }
 }
