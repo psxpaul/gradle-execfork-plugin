@@ -1,6 +1,7 @@
 include 'apply_from'
 include 'env_vars'
 include 'jacoco'
+include 'long_classpath'
 include 'redirect_output'
 include 'redirect_output_and_error'
 include 'shell_script'
