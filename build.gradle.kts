@@ -1,16 +1,22 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
 plugins {
     id("com.gradle.plugin-publish").version("0.14.0")
     id("org.jetbrains.kotlin.jvm").version("1.4.32")
     id("idea")
     id("maven-publish")
-     id("java-gradle-plugin")
+    id("java-gradle-plugin")
 }
 
 group = "com.github.psxpaul"
-version = File("VERSION").readText().trim()
-buildDir = File("build/gradle")
+version = File(rootDir, "VERSION").readText().trim()
 
 dependencies {
     implementation(gradleApi())
@@ -33,11 +39,6 @@ pluginBundle {
             displayName = "Gradle Exec Fork Plugin"
         }
     }
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
 }
 
 tasks {

@@ -4,6 +4,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.internal.jvm.Jvm
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.process.JavaForkOptions
 import org.gradle.process.internal.JavaForkOptionsFactory
 import java.io.File
@@ -74,7 +75,7 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
     private fun hasCommandLineExceedMaxLength(args: List<String>): Boolean {
         // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
         // Derived from MAX_ARG_STRLEN as per http://man7.org/linux/man-pages/man2/execve.2.html
-        val maxCommandLineLength = if (System.getProperty("os.name").contains("Windows")) 32767 else 131072
+        val maxCommandLineLength = if (DefaultNativePlatform.getCurrentOperatingSystem().isWindows()) 32767 else 131072
         return args.joinToString(" ").length > maxCommandLineLength
     }
 }

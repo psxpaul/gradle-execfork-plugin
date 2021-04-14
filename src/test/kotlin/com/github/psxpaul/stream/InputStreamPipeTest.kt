@@ -65,7 +65,7 @@ class InputStreamPipeTest {
     }
 
     private fun writeLine(output:String, postDelay:Long) {
-        outputBuffer.appendln(output)
+        outputBuffer.appendLine(output)
         outputBuffer.flush()
         Thread.sleep(postDelay)
     }
