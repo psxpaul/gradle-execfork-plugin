@@ -12,15 +12,16 @@ buildscript {
 }
 
 task integrationTest(dependsOn: 'startDaemon') {
-  doLast {
-    def content = file("${buildDir}/daemon.out").text
-    assert content.contains('Important work being done!')
-    assert content.contains('Daemon is up!')
-    assert !content.contains('PING')
-    Thread.sleep(1500)
-    content = file("${buildDir}/daemon.out").text
-    assert content.contains('PING')
-  }
+    def daemonFile = file("${buildDir}/daemon.out")
+    doLast {
+        def content = daemonFile.text
+        assert content.contains('Important work being done!')
+        assert content.contains('Daemon is up!')
+        assert !content.contains('PING')
+        Thread.sleep(1500)
+        content = daemonFile.text
+        assert content.contains('PING')
+    }
 }
 build.dependsOn integrationTest
 

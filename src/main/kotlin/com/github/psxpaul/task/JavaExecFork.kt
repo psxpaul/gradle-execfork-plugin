@@ -1,6 +1,7 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.internal.jvm.Jvm
@@ -27,7 +28,7 @@ import javax.inject.Inject
  * @param classpath the classpath to call java with
  * @param main the fully qualified name of the class to execute (e.g. 'com.foo.bar.MainExecutable')
  */
-open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory) : AbstractExecFork(),
+open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory, objectFactory: ObjectFactory) : AbstractExecFork(objectFactory),
         JavaForkOptions by forkOptionsFactory.newJavaForkOptions() {
 
     @InputFiles
@@ -47,7 +48,7 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
 
         if (hasCommandLineExceedMaxLength(processArgs)) {
             processArgs[processArgs.indexOf("-cp") + 1] =
-                    writePathingJarFile(bootstrapClasspath + classpath).path
+                    writePathingJarFile(bootstrapClasspath + classpath!!).path
         }
 
         return processArgs
