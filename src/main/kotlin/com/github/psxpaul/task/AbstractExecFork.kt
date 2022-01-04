@@ -44,7 +44,7 @@ abstract class AbstractExecFork : DefaultTask(), ProcessForkOptions {
     @Input
     override abstract fun getEnvironment(): MutableMap<String, Any>
 
-    @InputFile
+    @Input
     override abstract fun getExecutable(): String?
 
     @Input
