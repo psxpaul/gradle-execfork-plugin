@@ -1,0 +1,29 @@
+apply plugin: 'java'
+apply plugin: 'gradle-execfork-plugin'
+
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath "com.github.psxpaul:gradle-execfork-plugin:$pluginVersion"
+  }
+}
+
+task integrationTest(dependsOn: 'startDaemon') {
+  doLast {
+    sleep(500)
+    println "I hope the daemon is running"
+  }
+}
+build.dependsOn integrationTest
+
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'com.github.psxpaul.example.Main'
+  args = [ '--someArg', "$buildDir/somePath" ]
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
