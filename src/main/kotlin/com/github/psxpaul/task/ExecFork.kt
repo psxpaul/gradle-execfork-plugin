@@ -1,7 +1,7 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Input
 import org.gradle.process.ProcessForkOptions
 import org.gradle.process.internal.JavaForkOptionsFactory
 import javax.inject.Inject
@@ -21,7 +21,7 @@ open class ExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFacto
      * The path to the executable to run
      * @deprecated Use #executable instead
      */
-    @get:InputFile
+    @get:Input
     var commandLine: String?
         get() = executable
         set(value) {
