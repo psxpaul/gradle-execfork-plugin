@@ -1,4 +1,6 @@
+import org.gradle.api.internal.classpath.ModuleRegistry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.configurationcache.extensions.serviceOf
 
 allprojects {
     repositories {
@@ -31,6 +33,13 @@ dependencies {
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
+    // https://github.com/gradle/gradle/issues/16774
+    testRuntimeOnly(
+        files(
+            serviceOf<ModuleRegistry>().getModule("gradle-tooling-api-builders")
+                .classpath.asFiles
+        )
+    )
 }
 
 pluginBundle {

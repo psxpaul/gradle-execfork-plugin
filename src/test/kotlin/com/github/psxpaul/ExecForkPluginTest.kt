@@ -3,7 +3,10 @@ package com.github.psxpaul
 import com.github.psxpaul.task.AbstractExecFork
 import com.github.psxpaul.task.ExecJoin
 import com.github.psxpaul.task.JavaExecFork
+import com.github.psxpaul.task.createNameFor
+import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.Matchers.instanceOf
 import org.hamcrest.Matchers.sameInstance
@@ -16,8 +19,11 @@ class ExecForkPluginTest {
         val project: Project = ProjectBuilder.builder().build()
         project.pluginManager.apply("gradle-execfork-plugin")
 
+        val someTask = project.tasks.register("someTask")
+
         val opts = hashMapOf("type" to JavaExecFork::class.java)
-        project.task(opts, "startTestTask")
+        val startTestTask = project.task(opts, "startTestTask") as JavaExecFork
+        startTestTask.stopAfter = someTask
 
         val startTask = project.tasks.getByName("startTestTask")
         assertThat(startTask, instanceOf(JavaExecFork::class.java))
@@ -28,6 +34,5 @@ class ExecForkPluginTest {
 
         val joinTask = stopTask as ExecJoin
         assertThat(joinTask.forkTask, sameInstance(forkTask))
-        assertThat(forkTask.joinTask, sameInstance(joinTask))
     }
 }

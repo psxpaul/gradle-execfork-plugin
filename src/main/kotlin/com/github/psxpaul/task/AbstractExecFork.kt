@@ -233,19 +233,23 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
         stopAfter = task.project.tasks.named(task.name)
     }
 
+    @Internal
     fun setStandardOutput(standardOutput: String) {
         this.standardOutput.set(project.file(standardOutput))
     }
 
+    @Internal
     fun setStandardOutput(standardOutput: GString) {
         this.standardOutput.set(project.file(standardOutput))
     }
 
+    @Internal
     fun setErrorOutput(errorOutput: String) {
         this.errorOutput.set(project.file(errorOutput))
     }
 
+    @Internal
     fun setErrorOutput(errorOutput: GString) {
-        this.standardOutput.set(project.file(errorOutput))
+        this.errorOutput.set(project.file(errorOutput))
     }
 }
