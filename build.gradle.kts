@@ -9,7 +9,7 @@ allprojects {
 
 plugins {
     id("com.gradle.plugin-publish").version("0.14.0")
-    id("org.jetbrains.kotlin.jvm").version("1.4.32")
+    kotlin("jvm") version "1.4.32"
     id("idea")
     id("maven-publish")
     id("java-gradle-plugin")

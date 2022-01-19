@@ -1,9 +1,14 @@
 package com.github.psxpaul.task
 
 import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.internal.jvm.Jvm
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.process.JavaForkOptions
 import org.gradle.process.internal.JavaForkOptionsFactory
@@ -17,6 +22,7 @@ import java.util.stream.Collectors
 import java.util.zip.ZipEntry
 import javax.inject.Inject
 
+
 /**
  * A task that will run a java class in a separate process, optionally
  * writing stdout and stderr to disk, and waiting for a specified
@@ -27,8 +33,14 @@ import javax.inject.Inject
  * @param classpath the classpath to call java with
  * @param main the fully qualified name of the class to execute (e.g. 'com.foo.bar.MainExecutable')
  */
-open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory) : AbstractExecFork(),
+open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory, objectFactory: ObjectFactory) : AbstractExecFork(),
         JavaForkOptions by forkOptionsFactory.newJavaForkOptions() {
+    /**
+     * Configures the java executable to be used to run the tests.
+     */
+    @Nested
+    @Optional
+    val javaLauncher: Property<JavaLauncher> = objectFactory.property(JavaLauncher::class.java)
 
     @InputFiles
     var classpath: FileCollection? = null
@@ -38,7 +50,7 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
 
     override fun getProcessArgs(): List<String>? {
         val processArgs: MutableList<String> = mutableListOf()
-        processArgs.add(Jvm.current().javaExecutable.absolutePath)
+        processArgs.add(getEffectiveExecutable())
         processArgs.add("-cp")
         processArgs.add((bootstrapClasspath + classpath!!).asPath)
         processArgs.addAll(allJvmArgs)
@@ -77,5 +89,12 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
         // Derived from MAX_ARG_STRLEN as per http://man7.org/linux/man-pages/man2/execve.2.html
         val maxCommandLineLength = if (DefaultNativePlatform.getCurrentOperatingSystem().isWindows()) 32767 else 131072
         return args.joinToString(" ").length > maxCommandLineLength
+    }
+
+    private fun getEffectiveExecutable(): String {
+        if (javaLauncher.isPresent) {
+            return javaLauncher.get().executablePath.toString()
+        }
+        return executable ?: Jvm.current().javaExecutable.absolutePath
     }
 }
