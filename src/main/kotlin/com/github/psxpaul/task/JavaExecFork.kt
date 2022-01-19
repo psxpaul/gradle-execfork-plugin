@@ -3,7 +3,6 @@ package com.github.psxpaul.task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
@@ -22,7 +21,6 @@ import java.util.jar.Manifest
 import java.util.stream.Collectors
 import java.util.zip.ZipEntry
 import javax.inject.Inject
-
 
 /**
  * A task that will run a java class in a separate process, optionally
