@@ -3,6 +3,7 @@ package com.github.psxpaul.task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
@@ -33,8 +34,9 @@ import javax.inject.Inject
  * @param classpath the classpath to call java with
  * @param main the fully qualified name of the class to execute (e.g. 'com.foo.bar.MainExecutable')
  */
-open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory, objectFactory: ObjectFactory) : AbstractExecFork(),
-        JavaForkOptions by forkOptionsFactory.newJavaForkOptions() {
+open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory, objectFactory: ObjectFactory) :
+    AbstractExecFork(objectFactory),
+    JavaForkOptions by forkOptionsFactory.newJavaForkOptions() {
     /**
      * Configures the java executable to be used to run the tests.
      */
@@ -59,7 +61,7 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
 
         if (hasCommandLineExceedMaxLength(processArgs)) {
             processArgs[processArgs.indexOf("-cp") + 1] =
-                    writePathingJarFile(bootstrapClasspath + classpath).path
+                writePathingJarFile(bootstrapClasspath + classpath!!).path
         }
 
         return processArgs
@@ -79,8 +81,10 @@ open class JavaExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsF
         val manifest = Manifest()
         val attributes = manifest.mainAttributes
         attributes[Attributes.Name.MANIFEST_VERSION] = "1.0"
-        attributes.putValue("Class-Path",
-                classPath.files.stream().map(File::toURI).map(URI::toString).collect(Collectors.joining(" ")))
+        attributes.putValue(
+            "Class-Path",
+            classPath.files.stream().map(File::toURI).map(URI::toString).collect(Collectors.joining(" "))
+        )
         return manifest
     }
 

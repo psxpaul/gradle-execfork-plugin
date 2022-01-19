@@ -1,5 +1,6 @@
 package com.github.psxpaul.task
 
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.process.ProcessForkOptions
 import org.gradle.process.internal.JavaForkOptionsFactory
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * @see AbstractExecFork
  * @see ProcessForkOptions for all available configuration options
  */
-open class ExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory) : AbstractExecFork(),
+open class ExecFork @Inject constructor(forkOptionsFactory: JavaForkOptionsFactory, objectFactory: ObjectFactory) : AbstractExecFork(objectFactory),
         ProcessForkOptions by forkOptionsFactory.newJavaForkOptions() {
 
     /**
