@@ -32,15 +32,12 @@ class ExecForkPlugin : Plugin<Project> {
         }
 
         val forkTasks: ArrayList<AbstractExecFork> = ArrayList()
-        project.tasks.whenTaskAdded { task: Task ->
-            if (task is AbstractExecFork) {
-                val forkTask: AbstractExecFork = task
-                val joinTask: ExecJoin = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java)
-                joinTask.forkTask = forkTask
-                forkTask.joinTask = joinTask
+        project.tasks.withType(AbstractExecFork::class.java) { forkTask: AbstractExecFork ->
+            val joinTask: ExecJoin = project.tasks.create(createNameFor(forkTask), ExecJoin::class.java)
+            joinTask.forkTask = forkTask
+            forkTask.joinTask = joinTask
 
-                forkTasks.add(forkTask)
-            }
+            forkTasks.add(forkTask)
         }
 
         project.gradle.addBuildListener(object: BuildAdapter() {
