@@ -18,6 +18,12 @@ plugins {
 group = "com.github.psxpaul"
 version = File(rootDir, "VERSION").readText().trim()
 
+java {
+    toolchain {
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+}
+
 dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
