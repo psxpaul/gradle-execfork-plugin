@@ -24,8 +24,8 @@ task verify(dependsOn: 'startDaemon') {
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
-  standardOutput = "$buildDir/daemon.log"
-  errorOutput = "$buildDir/daemon-error.log"
+  standardOutput = layout.buildDirectory.file("daemon.log")
+  errorOutput = layout.buildDirectory.file("daemon-error.log")
   stopAfter = verify
 }
 

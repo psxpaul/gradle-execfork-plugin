@@ -4,7 +4,6 @@ import com.github.psxpaul.ForkTaskTerminationService
 import com.github.psxpaul.stream.InputStreamPipe
 import com.github.psxpaul.stream.OutputStreamLogger
 import com.github.psxpaul.util.waitForPortOpen
-import groovy.lang.GString
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Task
@@ -57,11 +56,11 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
 
     @OutputFile
     @Optional
-    var standardOutput: RegularFileProperty = objectFactory.fileProperty()
+    val standardOutput: RegularFileProperty = objectFactory.fileProperty()
 
     @OutputFile
     @Optional
-    var errorOutput: RegularFileProperty = objectFactory.fileProperty()
+    val errorOutput: RegularFileProperty = objectFactory.fileProperty()
 
     @Input
     @Optional
@@ -101,7 +100,7 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
             }
             logger.info("Adding {} as a finalizing task to {}", joinTask.name, stopAfterValue.name)
             stopAfterValue.configure {
-                finalizedBy(joinTask)
+                it.finalizedBy(joinTask)
             }
             field = stopAfterValue
         }
@@ -111,7 +110,7 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
     // This can be reproduced in the spring_boot sample project
     @Internal
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-    var forkTaskTerminationService: Property<in Object> = objectFactory.property(Object::class.java)
+    val forkTaskTerminationService: Property<in Object> = objectFactory.property(Object::class.java)
 
     init {
         // The exec fork task should be executed in any case if not manually specified otherwise.
@@ -231,25 +230,5 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
     @Deprecated("Use a task provider instead of a concrete Task instance", ReplaceWith("stopAfter = tasks.named(':myTask')"))
     fun setStopAfter(task: Task) {
         stopAfter = task.project.tasks.named(task.name)
-    }
-
-    @Internal
-    fun setStandardOutput(standardOutput: String) {
-        this.standardOutput.set(project.file(standardOutput))
-    }
-
-    @Internal
-    fun setStandardOutput(standardOutput: GString) {
-        this.standardOutput.set(project.file(standardOutput))
-    }
-
-    @Internal
-    fun setErrorOutput(errorOutput: String) {
-        this.errorOutput.set(project.file(errorOutput))
-    }
-
-    @Internal
-    fun setErrorOutput(errorOutput: GString) {
-        this.errorOutput.set(project.file(errorOutput))
     }
 }

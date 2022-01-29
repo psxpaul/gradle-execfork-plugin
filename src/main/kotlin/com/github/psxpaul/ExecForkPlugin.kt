@@ -25,7 +25,8 @@ class ExecForkPlugin @Inject constructor(private val buildEventsListenerRegistry
             throw GradleException("This version of the plugin is incompatible with Gradle < 6.7! Please use execfork version 0.1.15, or upgrade Gradle.")
         }
 
-        val forkTaskTerminationServiceProvider: Provider<ForkTaskTerminationService> = project.gradle.sharedServices.registerIfAbsent("fork-task-termination", ForkTaskTerminationService::class.java) {}
+        // We have to create a separate service per project due to https://github.com/gradle/gradle/issues/17559
+        val forkTaskTerminationServiceProvider: Provider<ForkTaskTerminationService> = project.gradle.sharedServices.registerIfAbsent("fork-task-termination-"+project.path, ForkTaskTerminationService::class.java) {}
 
         project.tasks.withType(AbstractExecFork::class.java) {
             @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")

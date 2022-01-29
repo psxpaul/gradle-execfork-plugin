@@ -26,8 +26,8 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
   jvmArgs = [ '-Dserver.port=9201' ]
-  standardOutput = "$buildDir/springboot.log"
-  errorOutput = "$buildDir/springboot-error.log"
+  standardOutput = layout.buildDirectory.file("springboot.log")
+  errorOutput = layout.buildDirectory.file("springboot-error.log")
   waitForPort = 9201
   timeout = 90
   stopAfter = test
