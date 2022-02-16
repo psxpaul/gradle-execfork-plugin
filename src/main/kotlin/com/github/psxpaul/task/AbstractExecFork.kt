@@ -120,7 +120,7 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
     }
 
     @TaskAction
-    fun exec() {
+    open fun exec() {
         val processBuilder: ProcessBuilder = ProcessBuilder(getProcessArgs())
         redirectStreams(processBuilder)
 
