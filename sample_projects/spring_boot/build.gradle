@@ -9,8 +9,8 @@ buildscript {
 }
 
 plugins {
-  id 'org.springframework.boot' version '2.1.1.RELEASE'
-  id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+  id 'org.springframework.boot' version '2.6.3'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 apply plugin: 'gradle-execfork-plugin'
@@ -26,8 +26,8 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
   jvmArgs = [ '-Dserver.port=9201' ]
-  standardOutput = "$buildDir/springboot.log"
-  errorOutput = "$buildDir/springboot-error.log"
+  standardOutput = layout.buildDirectory.file("springboot.log")
+  errorOutput = layout.buildDirectory.file("springboot-error.log")
   waitForPort = 9201
   timeout = 90
   stopAfter = test

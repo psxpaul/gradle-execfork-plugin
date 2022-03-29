@@ -32,13 +32,13 @@ task postVerify(dependsOn: 'stopDaemon') {
 
 task startDaemon(type: com.github.psxpaul.task.ExecFork) {
   if(org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-    executable = "$projectDir\\src\\main\\bash\\com\\github\\psxpaul\\example-win\\Main.bat"
+    executable = layout.projectDirectory.file("src\\main\\bash\\com\\github\\psxpaul\\example-win\\Main.bat")
   } else {
-    executable = "$projectDir/src/main/bash/com/github/psxpaul/example/Main.sh"
+    executable = layout.projectDirectory.file("src/main/bash/com/github/psxpaul/example/Main.sh")
   }
-  workingDir = "$projectDir/src/main/bash"
-  standardOutput = "$buildDir/daemon.log"
-  errorOutput = "$buildDir/daemon-error.log"
+  workingDir = layout.projectDirectory.file("src/main/bash")
+  standardOutput = layout.buildDirectory.file("daemon.log")
+  errorOutput = layout.buildDirectory.file("daemon-error.log")
   stopAfter = verify
 }
 

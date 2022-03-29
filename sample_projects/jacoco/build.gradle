@@ -22,7 +22,7 @@ task workerTask(dependsOn: 'startDaemon') {
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
-  standardOutput = "$buildDir/daemon.log"
+  standardOutput = layout.buildDirectory.file("daemon.log")
   waitForOutput = 'PING'
   stopAfter = workerTask
   jacoco.applyTo(it)

@@ -23,7 +23,7 @@ task verify(dependsOn: 'startDaemon') {
 task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
-  standardOutput = "$buildDir/daemon.log"
+  standardOutput = layout.buildDirectory.file("daemon.log")
   environment = ['VAR_TWO': "$buildDir/value_two", 'VAR_THREE': "/tmp/value_three"]
   environment 'VAR_ONE', "$buildDir/value_one"
   stopAfter = verify
