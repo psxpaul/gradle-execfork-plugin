@@ -11,7 +11,7 @@ allprojects {
 
 plugins {
     id("com.gradle.plugin-publish").version("0.14.0")
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm").version("1.6.21")
     id("idea")
     id("maven-publish")
     id("java-gradle-plugin")
@@ -28,8 +28,8 @@ java {
 
 dependencies {
     implementation(gradleApi())
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.10")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 
     testImplementation("junit:junit:4.12")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
