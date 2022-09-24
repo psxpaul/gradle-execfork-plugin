@@ -10,7 +10,7 @@ buildscript {
 
 apply plugin: com.github.psxpaul.ExecForkPlugin
 
-task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: ['classes', 'test', 'jar']) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
 }

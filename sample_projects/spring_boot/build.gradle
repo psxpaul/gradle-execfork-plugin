@@ -22,7 +22,7 @@ dependencies {
   testImplementation 'org.apache.httpcomponents:fluent-hc:4.5.2'
 }
 
-task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes') {
+task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: ['classes', 'compileTestJava', 'jar', 'bootJar']) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
   jvmArgs = [ '-Dserver.port=9201' ]
