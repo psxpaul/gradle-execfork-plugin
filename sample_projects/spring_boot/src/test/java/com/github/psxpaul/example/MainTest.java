@@ -15,6 +15,6 @@ public class MainTest {
       .socketTimeout(1000)
       .execute().returnContent().asString();
 
-    assertThat(responseBody, equalTo("PING"));
+    assertThat(responseBody.trim(), equalTo("PING"));
   }
 }
