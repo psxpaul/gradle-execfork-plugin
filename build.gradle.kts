@@ -10,8 +10,9 @@ allprojects {
 }
 
 plugins {
-    id("com.gradle.plugin-publish").version("0.14.0")
-    kotlin("jvm").version("1.6.21")
+
+    id("com.gradle.plugin-publish").version("1.0.0")
+    kotlin("jvm") version "1.6.21"
     id("idea")
     id("maven-publish")
     id("java-gradle-plugin")
@@ -45,13 +46,16 @@ dependencies {
 pluginBundle {
     website = "http://github.com/psxpaul"
     vcsUrl = "https://github.com/psxpaul/gradle-execfork-plugin"
-    description = "Execute Java or shell processes in the background during a build"
     tags = listOf("java", "exec", "background", "process")
+}
 
-    (plugins) {
+gradlePlugin {
+    plugins {
         create("execForkPlugin") {
             id = "com.github.psxpaul.execfork"
             displayName = "Gradle Exec Fork Plugin"
+            description = "Execute Java or shell processes in the background during a build"
+            implementationClass = "com.github.psxpaul.ExecForkPlugin"
         }
     }
 }
