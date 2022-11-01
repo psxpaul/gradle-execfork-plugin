@@ -25,5 +25,6 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   standardOutput = layout.buildDirectory.file("daemon.log")
   stopAfter = verify
 }
+startDaemon.mustRunAfter('jar', 'test')
 
 build.dependsOn verify

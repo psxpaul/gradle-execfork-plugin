@@ -30,3 +30,4 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   main = 'com.github.psxpaul.example.Main'
   args = [ '--someArg', "$buildDir/somePath" ]
 }
+startDaemon.mustRunAfter('jar', 'test')

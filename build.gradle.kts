@@ -67,6 +67,7 @@ tasks {
     sampleProjects.dependsOn("publishToMavenLocal")
     "test" { finalizedBy(sampleProjects) }
     named<Test>("test") {
+        testLogging.showStandardStreams = false
         testLogging.exceptionFormat = TestExceptionFormat.FULL
     }
 }

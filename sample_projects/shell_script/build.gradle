@@ -41,5 +41,6 @@ task startDaemon(type: com.github.psxpaul.task.ExecFork) {
   errorOutput = layout.buildDirectory.file("daemon-error.log")
   stopAfter = verify
 }
+startDaemon.mustRunAfter('jar', 'test')
 
 build.dependsOn verify, postVerify

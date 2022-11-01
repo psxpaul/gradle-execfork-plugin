@@ -31,5 +31,6 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: war) {
   timeout = 90
   stopAfter = test
 }
+startDaemon.mustRunAfter('compileTestJava')
 
 test.dependsOn startDaemon

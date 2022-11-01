@@ -14,3 +14,4 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   classpath = sourceSets.main.runtimeClasspath
   main = 'com.github.psxpaul.example.Main'
 }
+startDaemon.mustRunAfter('jar', 'test')

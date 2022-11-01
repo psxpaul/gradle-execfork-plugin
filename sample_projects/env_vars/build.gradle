@@ -28,5 +28,6 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   environment 'VAR_ONE', "$buildDir/value_one"
   stopAfter = verify
 }
+startDaemon.mustRunAfter('jar', 'test')
 
 build.dependsOn verify

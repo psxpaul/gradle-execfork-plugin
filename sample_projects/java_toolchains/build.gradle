@@ -27,3 +27,4 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
     languageVersion = JavaLanguageVersion.of(11)
   }
 }
+startDaemon.mustRunAfter('jar', 'test')

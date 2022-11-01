@@ -31,3 +31,4 @@ task startDaemon(type: com.github.psxpaul.task.JavaExecFork, dependsOn: 'classes
   standardOutput = layout.buildDirectory.file("daemon.out")
   waitForOutput = 'Daemon is up!'
 }
+startDaemon.mustRunAfter('jar', 'test')
