@@ -16,10 +16,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.*
-import java.util.stream.Stream
 
 /**
  * An abstract task that will launch an executable as a background process, optionally

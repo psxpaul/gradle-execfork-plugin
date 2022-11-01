@@ -3,10 +3,7 @@ package com.github.psxpaul
 import com.github.psxpaul.task.AbstractExecFork
 import com.github.psxpaul.task.ExecJoin
 import com.github.psxpaul.task.JavaExecFork
-import com.github.psxpaul.task.createNameFor
-import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.Matchers.instanceOf
 import org.hamcrest.Matchers.sameInstance

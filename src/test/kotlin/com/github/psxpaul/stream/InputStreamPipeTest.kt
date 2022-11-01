@@ -1,9 +1,10 @@
 package com.github.psxpaul.stream
 
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.`is`
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.junit.After
 import java.io.*
 import java.util.concurrent.CountDownLatch
 
