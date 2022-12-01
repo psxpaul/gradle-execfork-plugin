@@ -17,6 +17,7 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
+import kotlin.concurrent.thread
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.*
@@ -86,6 +87,8 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
     @Input
     var timeout: Long = 60
 
+    private val shutdownHook = thread(start = false) { stop() }
+
     @Internal
     var stopAfter: TaskProvider<Task>? = null
         set(stopAfterValue: TaskProvider<Task>?) {
@@ -139,12 +142,7 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
         if (waitForPortVal != null)
             waitForPortOpen(waitForPortVal, timeout, TimeUnit.SECONDS, process!!)
 
-        val task: AbstractExecFork = this
-        Runtime.getRuntime().addShutdownHook(object : Thread() {
-            override fun run() {
-                task.stop()
-            }
-        })
+        Runtime.getRuntime().addShutdownHook(shutdownHook)
         (forkTaskTerminationService.get() as ForkTaskTerminationService).addAbstractExecForkTask(this)
     }
 
@@ -185,6 +183,7 @@ abstract class AbstractExecFork(objectFactory: ObjectFactory) : DefaultTask(), P
         }
 
         stopRootProcess()
+        Runtime.getRuntime().removeShutdownHook(shutdownHook)
     }
 
     private fun stopRootProcess() {
